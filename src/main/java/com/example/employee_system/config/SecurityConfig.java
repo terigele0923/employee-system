@@ -9,19 +9,18 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-
+	
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http)
-			throws Exception {
-
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-			.authorizeHttpRequests(auth -> auth
+		
+		.authorizeHttpRequests(authz -> authz
 				.requestMatchers(
-					"/login",
-					"/css/**",
-					"/js/**"
-				).permitAll()
-				.anyRequest().authenticated()
+						"/login", 
+						"/css/**",
+						"/js/**"
+						).permitAll()
+						.anyRequest().authenticated()
 			)
 			.formLogin(form -> form
 				.loginPage("/login")
@@ -39,12 +38,12 @@ public class SecurityConfig {
 				.deleteCookies("JSESSIONID")
 				.permitAll()
 			);
-
 		return http.build();
 	}
-
+	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
 }

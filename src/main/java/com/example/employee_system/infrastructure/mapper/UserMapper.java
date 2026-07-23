@@ -5,8 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import com.example.employee_system.domain.model.User;
 
 @Mapper
-public interface  UserMapper {
+
+public interface UserMapper {
 	
 	User findByLoginId(String loginId);
-	
 }

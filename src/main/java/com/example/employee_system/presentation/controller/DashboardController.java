@@ -9,12 +9,16 @@ import com.example.employee_system.infrastructure.security.LoginUserDetails;
 
 @Controller
 public class DashboardController {
-
-	@GetMapping({ "/", "/dashboard" })
+	
+	@GetMapping({"/","/dashboard"})
 	public String dashboard(
 			@AuthenticationPrincipal LoginUserDetails loginUser,
 			Model model) {
+		
 		model.addAttribute("loginUser", loginUser.getUser());
 		return "dashboard";
 	}
+		
 }
+
+
