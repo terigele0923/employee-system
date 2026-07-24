@@ -1,0 +1,42 @@
+body {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* 契約終了まで残り15～30日 */
+.warning-caution > td {
+    background-color: #fff3cd !important;
+}
+
+/* 契約終了まで残り0～14日 */
+.warning-alert > td {
+    background-color: #ffe0b2 !important;
+}
+
+/* 契約期限超過 */
+.warning-expired > td {
+    background-color: #f8d7da !important;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* ダッシュボードの一覧を約10行分の高さに制限する */
+.dashboard-table-scroll {
+    max-height: 520px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+/* スクロールしてもテーブル見出しを上部に固定する */
+.dashboard-table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #f8f9fa;
+}

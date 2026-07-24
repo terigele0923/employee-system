@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.example.employee_system.infrastructure.mapper.InterviewMapper">
+
+	<!-- 直近面談予定一覧 -->
+	<select id="findUpcomingInterviews"
+		resultType="com.example.employee_system.domain.model.UpcomingInterview">
+
+		SELECT
+
+		i.interview_id AS interviewId,
+		i.interview_datetime AS interviewDatetime,
+
+		e.employee_id AS employeeId,
+		e.employee_name AS employeeName,
+
+		p.project_id AS projectId,
+		p.project_name AS projectName,
+
+		i.interview_type AS interviewTypeCode,
+
+		CASE i.interview_type
+		
+		WHEN '01' THEN '対面'
+		WHEN '02' THEN 'オンライン'
+		WHEN '03' THEN '電話'
+		ELSE '不明'
+		END AS interviewTypeName,
+
+		u.user_id AS salesUserId,
+		u.user_name AS salesUserName,
+
+		i.interview_status AS interviewStatusCode,
+
+		CASE i.interview_status
+		WHEN '01' THEN '予定'
+		WHEN '02' THEN '実施済み'
+		WHEN '03' THEN '延期'
+		WHEN '04' THEN 'キャンセル'
+		ELSE '不明'
+		END AS interviewStatusName
+
+		FROM interviews i
+
+		INNER JOIN employees e
+		ON e.employee_id = i.employee_id
+
+		INNER JOIN projects p
+		ON p.project_id = i.project_id
+
+		INNER JOIN users u
+		ON u.user_id = i.sales_user_id
+
+		WHERE i.interview_datetime
+		>=#{baseDatetime}
+
+
+		AND i.interview_status = '01'
+
+		AND i.deleted_at IS NULL
+		AND e.deleted_at IS NULL
+		AND p.deleted_at IS NULL
+		AND u.deleted_at IS NULL
+
+		<if test="salesUserId != null">
+			AND i.sales_user_id = #{salesUserId}
+		</if>
+
+		ORDER BY
+		i.interview_datetime ASC,
+		i.interview_id ASC
+
+	</select>
+
+</mapper>

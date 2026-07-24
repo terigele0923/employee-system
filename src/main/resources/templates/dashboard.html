@@ -1,68 +1,580 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>ダッシュボード | 社員管理システム</title>
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1">
 
-    <link
-        rel="stylesheet"
-        th:href="@{/css/bootstrap.min.css}">
+    <title>
+        ダッシュボード | 派遣管理システム
+    </title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+
+    <!-- ダッシュボード固有CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
 </head>
 
-<body class="bg-light">
+<body>
 
-    <!-- ヘッダー -->
-    <header class="navbar navbar-dark bg-primary shadow-sm">
-        <div class="container">
+    <!-- 共通ヘッダー -->
+    <nav class="navbar navbar-expand-lg
+                navbar-dark bg-primary shadow-sm">
 
-            <span class="navbar-brand mb-0 h1">
-                社員管理システム
-            </span>
+        <div class="container-fluid px-4">
 
-            <form th:action="@{/logout}" method="post">
-                <button
-                    type="submit"
-                    class="btn btn-outline-light btn-sm">
+            <a class="navbar-brand fw-bold"
+               th:href="@{/dashboard}">
+                派遣管理システム
+            </a>
 
-                    ログアウト
-                </button>
-            </form>
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar"
+                    aria-expanded="false"
+                    aria-label="メニューを開く">
 
-        </div>
-    </header>
+                <span class="navbar-toggler-icon">
+                </span>
+            </button>
 
-    <!-- メインコンテンツ -->
-    <main class="container py-5">
+            <div class="collapse navbar-collapse"
+                 id="mainNavbar">
 
-        <div class="card shadow-sm border-0">
+                <!-- 共通メニュー -->
+                <ul class="navbar-nav me-auto mb-2
+                           mb-lg-0">
 
-            <div class="card-body p-4">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           aria-current="page"
+                           th:href="@{/dashboard}">
+                            ダッシュボード
+                        </a>
+                    </li>
 
-                <h1 class="h3 mb-3">
-                    ダッシュボード
-                </h1>
+                    <li class="nav-item">
+						<a class="nav-link" th:href="@{/employees}">
+						    従業員
+						</a>
+                    </li>
 
-                <p class="mb-1">
-                    <span th:text="${loginUser.userName}">
-                        ユーザー名
-                    </span>
-                    さん、ようこそ。
-                </p>
+                    <li class="nav-item">
+                        <a class="nav-link disabled"
+                           href="#"
+                           aria-disabled="true">
+                            案件
+                        </a>
+                    </li>
 
-                <p class="text-secondary mb-0">
-                    権限：
-                    <span th:text="${loginUser.roleCode}">
-                        ROLE
-                    </span>
-                </p>
+                    <li class="nav-item">
+                        <a class="nav-link disabled"
+                           href="#"
+                           aria-disabled="true">
+                            面談
+                        </a>
+                    </li>
 
+                    <li class="nav-item"
+                        th:if="${
+                            loginUser.roleCode == 'ADMIN'
+                            or
+                            loginUser.roleCode == 'MANAGER'
+                        }">
+
+                        <a class="nav-link disabled"
+                           href="#"
+                           aria-disabled="true">
+                            管理
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- ログインユーザー -->
+                <div class="d-flex align-items-center
+                            gap-3 text-white">
+
+                    <div class="text-end">
+
+                        <div class="fw-semibold"
+                             th:text="${
+                                loginUser.userName
+                             }">
+                            ユーザー名
+                        </div>
+
+                        <small class="opacity-75"
+                               th:text="${
+                                  loginUser.roleCode
+                               }">
+                            ROLE
+                        </small>
+                    </div>
+
+                    <form th:action="@{/logout}"
+                          method="post">
+
+                        <button type="submit"
+                                class="btn
+                                       btn-outline-light
+                                       btn-sm">
+                            ログアウト
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
+    </nav>
 
+
+    <!-- メインコンテンツ -->
+    <main class="container-fluid px-4 py-4">
+
+        <div class="mb-4">
+
+            <h1 class="h3 mb-1">
+                ダッシュボード
+            </h1>
+
+            <p class="text-secondary mb-0">
+                現在の従業員・案件・面談状況
+            </p>
+        </div>
+
+
+        <!-- 集計カード -->
+        <section class="mb-4">
+
+            <div class="row g-3">
+
+                <!-- 待機中 -->
+                <div class="col-12 col-sm-6
+                            col-xl-3">
+
+                    <div class="card h-100
+                                border-0
+                                border-start
+                                border-primary
+                                border-4
+                                shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="text-secondary
+                                        fw-semibold">
+                                待機中
+                            </div>
+
+                            <div class="display-6 fw-bold">
+
+                                <span th:text="${
+                                    dashboard.waitingCount
+                                }">
+                                    0
+                                </span>
+
+                                <span class="fs-6 fw-normal">
+                                    人
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 現場参画中 -->
+                <div class="col-12 col-sm-6
+                            col-xl-3">
+
+                    <div class="card h-100
+                                border-0
+                                border-start
+                                border-success
+                                border-4
+                                shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="text-secondary
+                                        fw-semibold">
+                                現場参画中
+                            </div>
+
+                            <div class="display-6 fw-bold">
+
+                                <span th:text="${
+                                    dashboard.activeCount
+                                }">
+                                    0
+                                </span>
+
+                                <span class="fs-6 fw-normal">
+                                    人
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 契約終了30日以内 -->
+                <div class="col-12 col-sm-6
+                            col-xl-3">
+
+                    <div class="card h-100
+                                border-0
+                                border-start
+                                border-warning
+                                border-4
+                                shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="text-secondary
+                                        fw-semibold">
+                                契約終了30日以内
+                            </div>
+
+                            <div class="display-6 fw-bold">
+
+                                <span th:text="${
+                                    dashboard.endingSoonCount
+                                }">
+                                    0
+                                </span>
+
+                                <span class="fs-6 fw-normal">
+                                    人
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 募集中案件 -->
+                <div class="col-12 col-sm-6
+                            col-xl-3">
+
+                    <div class="card h-100
+                                border-0
+                                border-start
+                                border-info
+                                border-4
+                                shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="text-secondary
+                                        fw-semibold">
+                                募集中案件
+                            </div>
+
+                            <div class="display-6 fw-bold">
+
+                                <span th:text="${
+                                    dashboard.openProjectCount
+                                }">
+                                    0
+                                </span>
+
+                                <span class="fs-6 fw-normal">
+                                    件
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 一覧 -->
+        <div class="row g-4">
+
+            <!-- 契約終了予定者 -->
+            <section class="col-12 col-xxl-7">
+
+                <div class="card h-100
+                            border-0 shadow-sm">
+
+                    <div class="card-header
+                                bg-white py-3">
+
+                        <h2 class="h5 mb-0">
+                            契約終了予定者
+                        </h2>
+                    </div>
+
+                    <div class="table-responsive dashboard-table-scroll">
+
+                        <table class="table
+                                      table-hover mb-0">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th>氏名</th>
+                                    <th>状態</th>
+                                    <th>案件</th>
+                                    <th>契約終了日</th>
+                                    <th>残日数</th>
+                                    <th>担当</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr th:each="employee :
+                                    ${dashboard
+                                    .contractEndingEmployees}"
+
+                                    th:classappend="${
+                                        employee
+                                        .warningLevelCode == '01'
+                                        ? 'warning-caution'
+                                        : (
+                                            employee
+                                            .warningLevelCode == '02'
+                                            ? 'warning-alert'
+                                            : (
+                                                employee
+                                                .warningLevelCode == '03'
+                                                ? 'warning-expired'
+                                                : ''
+                                            )
+                                        )
+                                    }">
+
+                                    <td class="fw-semibold"
+                                        th:text="${
+                                            employee.employeeName
+                                        }">
+                                        従業員名
+                                    </td>
+
+                                    <td th:text="${
+                                        employee.workStatusName
+                                    }">
+                                        状態
+                                    </td>
+
+                                    <td th:text="${
+                                        employee.projectName
+                                    }">
+                                        案件名
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            th:if="${
+                                                employee
+                                                .contractEndDate
+                                                != null
+                                            }"
+
+                                            th:text="${
+                                                #temporals.format(
+                                                    employee
+                                                    .contractEndDate,
+                                                    'yyyy/MM/dd'
+                                                )
+                                            }">
+                                            2026/07/31
+                                        </span>
+
+                                        <span
+                                            th:unless="${
+                                                employee
+                                                .contractEndDate
+                                                != null
+                                            }">
+                                            －
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            th:if="${
+                                                employee
+                                                .remainingDays
+                                                != null
+                                            }"
+
+                                            th:text="${
+                                                employee
+                                                .remainingDays
+                                            } + '日'">
+                                            14日
+                                        </span>
+
+                                        <span
+                                            th:unless="${
+                                                employee
+                                                .remainingDays
+                                                != null
+                                            }">
+                                            －
+                                        </span>
+                                    </td>
+
+                                    <td th:text="${
+                                        employee.salesUserName
+                                    }">
+                                        担当者
+                                    </td>
+                                </tr>
+
+
+                                <!-- 0件表示 -->
+                                <tr th:if="${
+                                    #lists.isEmpty(
+                                        dashboard
+                                        .contractEndingEmployees
+                                    )
+                                }">
+
+                                    <td colspan="6"
+                                        class="text-center
+                                               text-secondary
+                                               py-5">
+
+                                        契約終了予定者は
+                                        いません。
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- 直近面談予定 -->
+            <section class="col-12 col-xxl-5">
+
+                <div class="card h-100
+                            border-0 shadow-sm">
+
+                    <div class="card-header
+                                bg-white py-3">
+
+                        <h2 class="h5 mb-0">
+                            直近面談予定
+                        </h2>
+                    </div>
+
+                    <div class="table-responsive dashboard-table-scroll">
+
+                        <table class="table
+                                      table-hover mb-0">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th>日時</th>
+                                    <th>従業員</th>
+                                    <th>案件</th>
+                                    <th>形式</th>
+                                    <th>担当</th>
+                                    <th>状態</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr th:each="interview :
+                                    ${dashboard
+                                    .upcomingInterviews}">
+
+                                    <td th:text="${
+                                        #temporals.format(
+                                            interview
+                                            .interviewDatetime,
+                                            'MM/dd HH:mm'
+                                        )
+                                    }">
+                                        07/25 14:00
+                                    </td>
+
+                                    <td class="fw-semibold"
+                                        th:text="${
+                                            interview.employeeName
+                                        }">
+                                        従業員名
+                                    </td>
+
+                                    <td th:text="${
+                                        interview.projectName
+                                    }">
+                                        案件名
+                                    </td>
+
+                                    <td th:text="${
+                                        interview
+                                        .interviewTypeName
+                                    }">
+                                        面談形式
+                                    </td>
+
+                                    <td th:text="${
+                                        interview.salesUserName
+                                    }">
+                                        担当者
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="badge
+                                                   text-bg-primary"
+
+                                            th:text="${
+                                                interview
+                                                .interviewStatusName
+                                            }">
+                                            予定
+                                        </span>
+                                    </td>
+                                </tr>
+
+
+                                <!-- 0件表示 -->
+                                <tr th:if="${
+                                    #lists.isEmpty(
+                                        dashboard
+                                        .upcomingInterviews
+                                    )
+                                }">
+
+                                    <td colspan="6"
+                                        class="text-center
+                                               text-secondary
+                                               py-5">
+
+                                        直近の面談予定は
+                                        ありません。
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
+
+
+    <!-- Bootstrap JavaScript -->
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 </html>

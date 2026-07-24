@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper
+	namespace="com.example.employee_system.infrastructure.mapper.AssignmentMapper">
+
+	<!-- 現在参加中の従業員数 -->
+	<select id="countActiveEmployees" resultType="long">
+
+		SELECT
+		COUNT(DISTINCT a.employee_id)
+		FROM assignments a
+		INNER JOIN employees e
+		ON e.employee_id = a.employee_id
+		WHERE a.assignment_status = '02'
+		AND e.work_status = '03'
+		AND a.deleted_at IS NULL
+		AND e.deleted_at IS NULL
+
+		<if test="salesUserId != null">
+			AND e.sales_user_id = #{salesUserId}
+		</if>
+
+
+	</select>
+
+	<!-- 指定期間内に契約終了する従業員 -->
+
+	<select id="countEmployeesEndingBetween" resultType="long">
+
+		SELECT
+		COUNT(DISTINCT a.employee_id)
+		FROM assignments a
+		INNER JOIN employees e
+
+		ON e.employee_id = a.employee_id
+		WHERE a.assignment_status = '02'
+		AND a.contract_end_date
+		BETWEEN #{startDate} AND #{endDate}
+		AND a.deleted_at IS NULL
+		AND e.deleted_at IS NULL
+
+
+		<if test="salesUserId != null">
+			AND e.sales_user_id = #{salesUserId}
+		</if>
+
+	</select>
+
+	<!-- 契約終了予定者一覧 -->
+	<select id="findContractEndingEmployees"
+		resultType="com.example.employee_system.domain.model.ContractEndingEmployee">
+
+		SELECT
+		e.employee_id AS employeeId,
+		e.employee_name AS employeeName,
+
+		e.work_status AS workStatusCode,
+
+		CASE e.work_status
+		WHEN '01' THEN '待機中'
+		WHEN '02' THEN '面談調整中'
+		WHEN '03' THEN '現場参画中'
+		WHEN '04' THEN '休職中'
+		WHEN '09' THEN '退職済み'
+		ELSE '不明'
+		END AS workStatusName,
+
+		p.project_name AS projectName,
+		a.contract_end_date AS contractEndDate,
+
+		DATEDIFF(
+		a.contract_end_date,
+		#{baseDate}
+		) AS remainingDays,
+
+		u.user_name AS salesUserName,
+
+		CASE
+		WHEN DATEDIFF(
+		a.contract_end_date,
+		#{baseDate}
+		) &lt; 0
+		THEN '03'
+
+		WHEN DATEDIFF(
+		a.contract_end_date,
+		#{baseDate}
+		) &lt;= 14
+		THEN '02'
+
+		WHEN DATEDIFF(
+		a.contract_end_date,
+		#{baseDate}
+		) &lt;= 30
+		THEN '01'
+
+		ELSE '00'
+		END AS warningLevelCode
+
+		FROM assignments a
+
+		INNER JOIN employees e
+		ON e.employee_id = a.employee_id
+
+		INNER JOIN projects p
+		ON p.project_id = a.project_id
+
+		INNER JOIN users u
+		ON u.user_id = e.sales_user_id
+
+		WHERE a.assignment_status = '02'
+		AND a.contract_end_date IS NOT NULL
+		AND a.contract_end_date
+		&lt;= DATE_ADD(
+		#{baseDate},
+		INTERVAL 30 DAY
+		)
+		AND a.deleted_at IS NULL
+		AND e.deleted_at IS NULL
+		AND p.deleted_at IS NULL
+
+		<if test="salesUserId != null">
+			AND e.sales_user_id = #{salesUserId}
+		</if>
+
+		ORDER BY
+		CASE
+		WHEN a.contract_end_date
+		&lt; #{baseDate}
+		THEN 3
+
+		WHEN DATEDIFF(
+		a.contract_end_date,
+		#{baseDate}
+		) &lt;= 14
+		THEN 2
+
+		WHEN DATEDIFF(
+		a.contract_end_date,
+		#{baseDate}
+		) &lt;= 30
+		THEN 1
+
+		ELSE 0
+		END DESC,
+
+		a.contract_end_date ASC,
+		e.employee_name ASC
+
+	</select>
+
+</mapper>

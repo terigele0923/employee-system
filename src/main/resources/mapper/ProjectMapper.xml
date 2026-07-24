@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+
+<mapper namespace="com.example.employee_system.infrastructure.mapper.ProjectMapper">
+
+	<!-- 募集中の案件数 -->
+	
+	<select id="countOpenProjects"
+			resultType="long">
+	
+		SELECT
+			COUNT(*)
+		FROM projects p
+		WHERE p.project_status = '01'
+			AND p.deleted_at  IS NULL
+			
+		<if test="salesUserId != null">
+			AND p.sales_user_id = #{salesUserId}
+		</if>
+		
+	
+	</select>
+</mapper>
