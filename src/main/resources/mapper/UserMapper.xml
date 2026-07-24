@@ -23,4 +23,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			AND u.is_active = TRUE
 			AND u.deleted_at IS NULL
 	</select>
+
+    <select id="findActiveSalesUsers"
+            resultType="com.example.employee_system.domain.model.User">
+
+        SELECT
+            u.user_id AS userId,
+            u.user_name AS userName,
+            u.login_id AS loginId,
+            r.role_code AS roleCode
+        FROM users u
+        INNER JOIN roles r
+            ON r.role_id = u.role_id
+        WHERE r.role_code = 'SALES'
+          AND u.is_active = TRUE
+          AND u.deleted_at IS NULL
+        ORDER BY u.user_name ASC
+
+    </select>
+
+    <select id="countActiveSalesUserById"
+            resultType="long">
+
+        SELECT
+            COUNT(*)
+        FROM users u
+        INNER JOIN roles r
+            ON r.role_id = u.role_id
+        WHERE u.user_id = #{userId}
+          AND r.role_code = 'SALES'
+          AND u.is_active = TRUE
+          AND u.deleted_at IS NULL
+
+    </select>
 </mapper>

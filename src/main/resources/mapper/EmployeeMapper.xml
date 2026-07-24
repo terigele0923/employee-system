@@ -5,6 +5,7 @@
 
 <mapper namespace="com.example.employee_system.infrastructure.mapper.EmployeeMapper">
 
+    <!-- 待機中従業員数 -->
     <select id="countWaitingEmployees"
             resultType="long">
 
@@ -20,5 +21,403 @@
         </if>
 
     </select>
+
+
+    <!-- 従業員一覧検索と件数取得で共通利用する検索条件 -->
+    <sql id="employeeSearchConditions">
+
+        e.deleted_at IS NULL
+
+        <!-- 社員番号：部分一致 -->
+        <if test="condition.employeeNo != null
+                  and condition.employeeNo != ''">
+            AND e.employee_no LIKE CONCAT(
+                '%',
+                #{condition.employeeNo},
+                '%'
+            )
+        </if>
+
+        <!-- 氏名：部分一致 -->
+        <if test="condition.employeeName != null
+                  and condition.employeeName != ''">
+            AND e.employee_name LIKE CONCAT(
+                '%',
+                #{condition.employeeName},
+                '%'
+            )
+        </if>
+
+        <!-- 稼働状況：完全一致 -->
+        <if test="condition.workStatusCode != null
+                  and condition.workStatusCode != ''">
+            AND e.work_status =
+                #{condition.workStatusCode}
+        </if>
+
+        <!-- 営業担当者 -->
+        <if test="condition.salesUserId != null">
+            AND e.sales_user_id =
+                #{condition.salesUserId}
+        </if>
+
+        <!-- 最寄駅：部分一致 -->
+        <if test="condition.nearestStation != null
+                  and condition.nearestStation != ''">
+            AND e.nearest_station LIKE CONCAT(
+                '%',
+                #{condition.nearestStation},
+                '%'
+            )
+        </if>
+
+        <!-- スキルと最低経験月数 -->
+        <if test="condition.skillId != null">
+            AND EXISTS (
+                SELECT
+                    1
+                FROM employee_skills es_filter
+                WHERE es_filter.employee_id =
+                      e.employee_id
+                  AND es_filter.skill_id =
+                      #{condition.skillId}
+                  AND es_filter.deleted_at IS NULL
+
+                <if test="condition.minExperienceMonths != null">
+                    AND es_filter.experience_months
+                        &gt;=
+                        #{condition.minExperienceMonths}
+                </if>
+            )
+        </if>
+
+        <!-- 指定日数以内に契約終了する従業員 -->
+        <if test="condition.endWithinDays != null">
+            AND EXISTS (
+                SELECT
+                    1
+                FROM assignments a_filter
+                WHERE a_filter.employee_id =
+                      e.employee_id
+                  AND a_filter.assignment_status = '02'
+                  AND a_filter.contract_end_date
+                      IS NOT NULL
+                  AND a_filter.contract_end_date
+                      &gt;= CURRENT_DATE
+                  AND a_filter.contract_end_date
+                      &lt;= DATE_ADD(
+                          CURRENT_DATE,
+                          INTERVAL
+                          #{condition.endWithinDays}
+                          DAY
+                      )
+                  AND a_filter.deleted_at IS NULL
+            )
+        </if>
+
+    </sql>
+
+
+    <!-- 従業員一覧取得 -->
+    <select id="searchEmployees"
+            resultType="com.example.employee_system.domain.model.EmployeeSummary">
+
+        SELECT
+            e.employee_id AS employeeId,
+            e.employee_no AS employeeNo,
+            e.employee_name AS employeeName,
+
+            TIMESTAMPDIFF(
+                YEAR,
+                e.birth_date,
+                CURRENT_DATE
+            ) AS age,
+
+            e.nearest_station AS nearestStation,
+            e.work_status AS workStatusCode,
+
+            CASE e.work_status
+                WHEN '01' THEN '待機中'
+                WHEN '02' THEN '面談調整中'
+                WHEN '03' THEN '稼働中'
+                WHEN '04' THEN '休職中'
+                WHEN '09' THEN '退職済み'
+                ELSE '不明'
+            END AS workStatusName,
+
+            (
+                SELECT
+                    GROUP_CONCAT(
+                        s.skill_name
+                        ORDER BY
+                            es.skill_level DESC,
+                            es.experience_months DESC
+                        SEPARATOR ', '
+                    )
+                FROM employee_skills es
+                INNER JOIN skills s
+                    ON s.skill_id = es.skill_id
+                   AND s.deleted_at IS NULL
+                   AND s.is_active = TRUE
+                WHERE es.employee_id = e.employee_id
+                  AND es.deleted_at IS NULL
+            ) AS primarySkills,
+
+            p.project_name AS currentProjectName,
+            a.contract_end_date AS contractEndDate,
+
+            CASE
+                WHEN a.contract_end_date IS NULL
+                    THEN NULL
+                ELSE DATEDIFF(
+                    a.contract_end_date,
+                    CURRENT_DATE
+                )
+            END AS remainingDays,
+
+            u.user_name AS salesUserName,
+
+            CASE
+                WHEN a.contract_end_date IS NULL
+                    THEN '00'
+                WHEN a.contract_end_date
+                     &lt; CURRENT_DATE
+                    THEN '03'
+                WHEN DATEDIFF(
+                         a.contract_end_date,
+                         CURRENT_DATE
+                     ) &lt;= 14
+                    THEN '02'
+                WHEN DATEDIFF(
+                         a.contract_end_date,
+                         CURRENT_DATE
+                     ) &lt;= 30
+                    THEN '01'
+                ELSE '00'
+            END AS warningLevelCode
+
+        FROM employees e
+
+        INNER JOIN users u
+            ON u.user_id = e.sales_user_id
+           AND u.deleted_at IS NULL
+
+        <!--
+            従業員の現在有効なアサインを1件取得する。
+            複数ある場合は開始日が新しいものを優先する。
+        -->
+        LEFT JOIN assignments a
+            ON a.assignment_id = (
+                SELECT
+                    a_current.assignment_id
+                FROM assignments a_current
+                WHERE a_current.employee_id =
+                      e.employee_id
+                  AND a_current.assignment_status = '02'
+                  AND a_current.deleted_at IS NULL
+                ORDER BY
+                    a_current.contract_start_date DESC,
+                    a_current.assignment_id DESC
+                LIMIT 1
+            )
+
+        LEFT JOIN projects p
+            ON p.project_id = a.project_id
+           AND p.deleted_at IS NULL
+
+        WHERE
+            <include refid="employeeSearchConditions"/>
+
+        ORDER BY
+            CASE
+                WHEN a.contract_end_date IS NULL
+                    THEN 4
+                WHEN a.contract_end_date
+                     &lt; CURRENT_DATE
+                    THEN 1
+                WHEN DATEDIFF(
+                         a.contract_end_date,
+                         CURRENT_DATE
+                     ) &lt;= 14
+                    THEN 2
+                WHEN DATEDIFF(
+                         a.contract_end_date,
+                         CURRENT_DATE
+                     ) &lt;= 30
+                    THEN 3
+                ELSE 4
+            END ASC,
+            a.contract_end_date ASC,
+            e.employee_no ASC
+
+        LIMIT #{limit}
+        OFFSET #{offset}
+
+    </select>
+
+
+    <!-- 検索条件に一致する従業員の総件数 -->
+    <select id="countEmployees"
+            resultType="long">
+
+        SELECT
+            COUNT(*)
+        FROM employees e
+        WHERE
+            <include refid="employeeSearchConditions"/>
+
+    </select>
+
+    <!-- 社員番号重複確認 -->
+    <select id="countByEmployeeNo"
+            resultType="long">
+
+        SELECT
+            COUNT(*)
+        FROM employees
+        WHERE employee_no = #{employeeNo}
+
+    </select>
+
+    <!-- 従業員基本情報取得 -->
+    <select id="findById"
+            resultType="com.example.employee_system.domain.model.Employee">
+
+        SELECT
+            employee_id AS employeeId,
+            employee_no AS employeeNo,
+            employee_name AS employeeName,
+            birth_date AS birthDate,
+            phone_no AS phoneNo,
+            postal_code AS postalCode,
+            address,
+            nearest_station AS nearestStation,
+            join_date AS joinDate,
+            employment_status AS employmentStatus,
+            work_status AS workStatus,
+            sales_user_id AS salesUserId,
+            remarks
+        FROM employees
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+
+    </select>
+
+    <!-- 従業員新規登録 -->
+    <insert id="insert"
+            parameterType="com.example.employee_system.domain.model.Employee"
+            useGeneratedKeys="true"
+            keyProperty="employeeId">
+
+        INSERT INTO employees (
+            employee_no,
+            employee_name,
+            birth_date,
+            phone_no,
+            postal_code,
+            address,
+            nearest_station,
+            join_date,
+            employment_status,
+            work_status,
+            sales_user_id,
+            remarks,
+            created_by,
+            updated_by
+        ) VALUES (
+            #{employeeNo},
+            #{employeeName},
+            #{birthDate},
+            #{phoneNo},
+            #{postalCode},
+            #{address},
+            #{nearestStation},
+            #{joinDate},
+            #{employmentStatus},
+            #{workStatus},
+            #{salesUserId},
+            #{remarks},
+            #{createdBy},
+            #{updatedBy}
+        )
+
+    </insert>
+
+    <!-- 従業員基本情報更新 -->
+    <update id="update"
+            parameterType="com.example.employee_system.domain.model.Employee">
+
+        UPDATE employees
+        SET employee_name = #{employeeName},
+            birth_date = #{birthDate},
+            phone_no = #{phoneNo},
+            postal_code = #{postalCode},
+            address = #{address},
+            nearest_station = #{nearestStation},
+            join_date = #{joinDate},
+            employment_status = #{employmentStatus},
+            work_status = #{workStatus},
+            sales_user_id = #{salesUserId},
+            remarks = #{remarks},
+            updated_by = #{updatedBy}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+
+    </update>
+
+    <!-- 従業員の面談に属する質問を論理削除 -->
+    <update id="logicalDeleteInterviewQuestions">
+        UPDATE interview_questions iq
+        INNER JOIN interviews i
+            ON i.interview_id = iq.interview_id
+        SET iq.deleted_at = CURRENT_TIMESTAMP,
+            iq.updated_by = #{loginUserId}
+        WHERE i.employee_id = #{employeeId}
+          AND iq.deleted_at IS NULL
+    </update>
+
+    <!-- 従業員の面談を論理削除 -->
+    <update id="logicalDeleteInterviews">
+        UPDATE interviews
+        SET deleted_at = CURRENT_TIMESTAMP,
+            updated_by = #{loginUserId}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 従業員のマッチング結果を論理削除 -->
+    <update id="logicalDeleteMatchingResults">
+        UPDATE matching_results
+        SET deleted_at = CURRENT_TIMESTAMP
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 従業員の参画契約を論理削除 -->
+    <update id="logicalDeleteAssignments">
+        UPDATE assignments
+        SET deleted_at = CURRENT_TIMESTAMP,
+            updated_by = #{loginUserId}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 従業員のスキルを論理削除 -->
+    <update id="logicalDeleteEmployeeSkills">
+        UPDATE employee_skills
+        SET deleted_at = CURRENT_TIMESTAMP,
+            updated_by = #{loginUserId}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+    </update>
+
+    <!-- 従業員本体を論理削除 -->
+    <update id="logicalDeleteEmployee">
+        UPDATE employees
+        SET deleted_at = CURRENT_TIMESTAMP,
+            updated_by = #{loginUserId}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+    </update>
 
 </mapper>

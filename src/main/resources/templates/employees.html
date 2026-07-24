@@ -1,12 +1,659 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-	
-	<h1>従業員一覧ページです</h1>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org">
 
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>従業員一覧 | 派遣管理システム</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-light">
+
+    <!-- 共通ヘッダー -->
+    <nav class="navbar navbar-expand-lg
+                navbar-dark bg-primary shadow-sm">
+
+        <div class="container-fluid px-4">
+
+            <a class="navbar-brand fw-bold"
+               th:href="@{/dashboard}">
+                派遣管理システム
+            </a>
+
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar"
+                    aria-expanded="false"
+                    aria-label="メニューを開く">
+
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse"
+                 id="mainNavbar">
+
+                <ul class="navbar-nav me-auto
+                           mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           th:href="@{/dashboard}">
+                            ダッシュボード
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           aria-current="page"
+                           th:href="@{/employees}">
+                            従業員
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link disabled"
+                           href="#"
+                           aria-disabled="true">
+                            案件
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link disabled"
+                           href="#"
+                           aria-disabled="true">
+                            面談
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link disabled"
+                           href="#"
+                           aria-disabled="true">
+                            管理
+                        </a>
+                    </li>
+                </ul>
+
+                <form th:action="@{/logout}"
+                      method="post">
+
+                    <button type="submit"
+                            class="btn btn-outline-light btn-sm">
+                        ログアウト
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+
+    <main class="container-fluid px-4 py-4">
+
+        <!-- ページタイトル -->
+        <div class="d-flex flex-wrap
+                    justify-content-between
+                    align-items-center
+                    gap-3 mb-4">
+
+            <div>
+                <h1 class="h3 mb-1">
+                    従業員一覧
+                </h1>
+
+                <p class="text-secondary mb-0">
+                    検索条件を指定して従業員を検索します。
+                </p>
+            </div>
+
+            <a class="btn btn-primary"
+               th:href="@{/employees/new}">
+                新規登録
+            </a>
+        </div>
+
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert"
+             th:if="${successMessage != null}">
+            <span th:text="${successMessage}">
+                従業員を登録しました。
+            </span>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="閉じる">
+            </button>
+        </div>
+
+        <!-- 検索条件 -->
+        <section class="card border-0 shadow-sm mb-4">
+
+            <div class="card-header bg-white py-3">
+                <h2 class="h5 mb-0">
+                    検索条件
+                </h2>
+            </div>
+
+            <div class="card-body">
+
+                <form th:action="@{/employees}"
+                      th:object="${searchRequest}"
+                      method="get">
+
+                    <div class="row g-3">
+
+                        <!-- 社員番号 -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="employeeNo"
+                                   class="form-label">
+                                社員番号
+                            </label>
+
+                            <input type="text"
+                                   id="employeeNo"
+                                   class="form-control"
+                                   th:field="*{employeeNo}"
+                                   placeholder="例：EMP0001">
+                        </div>
+
+                        <!-- 氏名 -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="employeeName"
+                                   class="form-label">
+                                氏名
+                            </label>
+
+                            <input type="text"
+                                   id="employeeName"
+                                   class="form-control"
+                                   th:field="*{employeeName}"
+                                   placeholder="氏名の一部を入力">
+                        </div>
+
+                        <!-- 稼働状況 -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="workStatusCode"
+                                   class="form-label">
+                                稼働状況
+                            </label>
+
+                            <select id="workStatusCode"
+                                    class="form-select"
+                                    th:field="*{workStatusCode}">
+
+                                <option value="">
+                                    指定なし
+                                </option>
+
+                                <option value="01">
+                                    待機中
+                                </option>
+
+                                <option value="02">
+                                    面談調整中
+                                </option>
+
+                                <option value="03">
+                                    稼働中
+                                </option>
+
+                                <option value="04">
+                                    休職中
+                                </option>
+
+                                <option value="09">
+                                    退職済み
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- 営業担当者ID -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="salesUserId"
+                                   class="form-label">
+                                営業担当者ID
+                            </label>
+
+                            <input type="number"
+                                   id="salesUserId"
+                                   class="form-control"
+                                   th:field="*{salesUserId}"
+                                   min="1"
+                                   placeholder="例：2">
+                        </div>
+
+                        <!-- 最寄駅 -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="nearestStation"
+                                   class="form-label">
+                                最寄駅
+                            </label>
+
+                            <input type="text"
+                                   id="nearestStation"
+                                   class="form-control"
+                                   th:field="*{nearestStation}"
+                                   placeholder="例：新宿">
+                        </div>
+
+                        <!-- スキルID -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="skillId"
+                                   class="form-label">
+                                スキルID
+                            </label>
+
+                            <input type="number"
+                                   id="skillId"
+                                   class="form-control"
+                                   th:field="*{skillId}"
+                                   min="1"
+                                   placeholder="例：1">
+                        </div>
+
+                        <!-- 最低経験月数 -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="minExperienceMonths"
+                                   class="form-label">
+                                最低経験月数
+                            </label>
+
+                            <div class="input-group">
+
+                                <input type="number"
+                                       id="minExperienceMonths"
+                                       class="form-control"
+                                       th:field="*{minExperienceMonths}"
+                                       min="0"
+                                       placeholder="例：24">
+
+                                <span class="input-group-text">
+                                    か月以上
+                                </span>
+                            </div>
+
+                            <div class="form-text">
+                                スキルIDと一緒に指定します。
+                            </div>
+                        </div>
+
+                        <!-- 契約終了までの日数 -->
+                        <div class="col-12 col-md-6 col-xl-3">
+
+                            <label for="endWithinDays"
+                                   class="form-label">
+                                契約終了予定
+                            </label>
+
+                            <select id="endWithinDays"
+                                    class="form-select"
+                                    th:field="*{endWithinDays}">
+
+                                <option value="">
+                                    指定なし
+                                </option>
+
+                                <option value="7">
+                                    7日以内
+                                </option>
+
+                                <option value="14">
+                                    14日以内
+                                </option>
+
+                                <option value="30">
+                                    30日以内
+                                </option>
+
+                                <option value="60">
+                                    60日以内
+                                </option>
+
+                                <option value="90">
+                                    90日以内
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <!-- 検索・クリアボタン -->
+                    <div class="d-flex justify-content-end
+                                gap-2 mt-4">
+
+                        <a class="btn btn-outline-secondary"
+                           th:href="@{/employees}">
+                            クリア
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            検索
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+
+        <!-- 検索結果 -->
+        <section class="card border-0 shadow-sm">
+
+            <div class="card-header bg-white py-3">
+
+                <div class="d-flex flex-wrap
+                            justify-content-between
+                            align-items-center gap-2">
+
+                    <h2 class="h5 mb-0">
+                        検索結果
+                    </h2>
+
+                    <span class="text-secondary">
+
+                        全
+                        <strong th:text="${searchResult.totalCount}">
+                            0
+                        </strong>
+                        件
+
+                        <span th:if="${searchResult.totalCount > 0}">
+                            ／
+                            <strong th:text="${searchResult.currentPage}">
+                                1
+                            </strong>
+                            ページ目
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover
+                              align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>社員番号</th>
+                            <th>氏名</th>
+                            <th>年齢</th>
+                            <th>最寄駅</th>
+                            <th>稼働状況</th>
+                            <th>主要スキル</th>
+                            <th>現在の案件</th>
+                            <th>契約終了日</th>
+                            <th>残日数</th>
+                            <th>営業担当者</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <!-- 従業員一覧 -->
+                        <tr th:each="employee : ${searchResult.employees}"
+                            th:classappend="${
+                                employee.warningLevelCode == '03'
+                                ? 'table-danger'
+                                : (
+                                    employee.warningLevelCode == '02'
+                                    ? 'table-warning'
+                                    : ''
+                                )
+                            }">
+
+                            <td th:text="${employee.employeeNo}">
+                                EMP0001
+                            </td>
+
+                            <td>
+                                <a class="fw-semibold
+                                          text-decoration-none"
+                                   th:href="@{/employees/{id}
+                                      (id=${employee.employeeId})}"
+                                   th:text="${employee.employeeName}">
+                                    山田 太郎
+                                </a>
+                            </td>
+
+                            <td>
+                                <span th:if="${employee.age != null}"
+                                      th:text="${employee.age} + '歳'">
+                                    30歳
+                                </span>
+
+                                <span th:unless="${employee.age != null}">
+                                    ―
+                                </span>
+                            </td>
+
+                            <td th:text="${
+                                    employee.nearestStation != null
+                                    ? employee.nearestStation
+                                    : '―'
+                                }">
+                                新宿駅
+                            </td>
+
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${
+                                          employee.workStatusCode == '03'
+                                          ? 'text-bg-success'
+                                          : (
+                                              employee.workStatusCode == '01'
+                                              ? 'text-bg-secondary'
+                                              : (
+                                                  employee.workStatusCode == '02'
+                                                  ? 'text-bg-info'
+                                                  : 'text-bg-light'
+                                              )
+                                          )
+                                      }"
+                                      th:text="${employee.workStatusName}">
+                                    稼働中
+                                </span>
+                            </td>
+
+                            <td th:text="${
+                                    employee.primarySkills != null
+                                    ? employee.primarySkills
+                                    : '―'
+                                }">
+                                Java, Spring Boot
+                            </td>
+
+                            <td th:text="${
+                                    employee.currentProjectName != null
+                                    ? employee.currentProjectName
+                                    : '―'
+                                }">
+                                販売管理システム
+                            </td>
+
+                            <td>
+                                <span th:if="${
+                                          employee.contractEndDate != null
+                                      }"
+                                      th:text="${
+                                          #temporals.format(
+                                              employee.contractEndDate,
+                                              'yyyy/MM/dd'
+                                          )
+                                      }">
+                                    2026/08/31
+                                </span>
+
+                                <span th:unless="${
+                                          employee.contractEndDate != null
+                                      }">
+                                    ―
+                                </span>
+                            </td>
+
+                            <td>
+                                <span th:if="${
+                                          employee.remainingDays != null
+                                      }"
+                                      th:text="${
+                                          employee.remainingDays
+                                      } + '日'">
+                                    30日
+                                </span>
+
+                                <span th:unless="${
+                                          employee.remainingDays != null
+                                      }">
+                                    ―
+                                </span>
+                            </td>
+
+                            <td th:text="${
+                                    employee.salesUserName != null
+                                    ? employee.salesUserName
+                                    : '―'
+                                }">
+                                営業 一郎
+                            </td>
+                        </tr>
+
+
+                        <!-- 0件の場合 -->
+                        <tr th:if="${
+                              #lists.isEmpty(
+                                  searchResult.employees
+                              )
+                            }">
+
+                            <td colspan="10"
+                                class="text-center
+                                       text-secondary py-5">
+
+                                条件に一致する従業員がいません。
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- ページング -->
+            <div class="card-footer bg-white"
+                 th:if="${searchResult.totalPages > 1}">
+
+                <nav aria-label="従業員一覧のページ切り替え">
+
+                    <ul class="pagination
+                               justify-content-center
+                               mb-0">
+
+                        <!-- 前へ -->
+                        <li class="page-item"
+                            th:classappend="${
+                                !searchResult.hasPrevious
+                                ? 'disabled'
+                                : ''
+                            }">
+
+                            <a class="page-link"
+                               th:href="@{/employees(
+                                   employeeNo=${searchRequest.employeeNo},
+                                   employeeName=${searchRequest.employeeName},
+                                   workStatusCode=${searchRequest.workStatusCode},
+                                   salesUserId=${searchRequest.salesUserId},
+                                   nearestStation=${searchRequest.nearestStation},
+                                   skillId=${searchRequest.skillId},
+                                   minExperienceMonths=${searchRequest.minExperienceMonths},
+                                   endWithinDays=${searchRequest.endWithinDays},
+                                   page=${searchResult.currentPage - 1}
+                               )}">
+                                前へ
+                            </a>
+                        </li>
+
+
+                        <!-- ページ番号 -->
+                        <th:block th:each="pageNumber :
+                            ${#numbers.sequence(
+                                1,
+                                searchResult.totalPages
+                            )}">
+
+                            <li class="page-item"
+                                th:classappend="${
+                                    pageNumber
+                                    == searchResult.currentPage
+                                    ? 'active'
+                                    : ''
+                                }">
+
+                                <a class="page-link"
+                                   th:href="@{/employees(
+                                       employeeNo=${searchRequest.employeeNo},
+                                       employeeName=${searchRequest.employeeName},
+                                       workStatusCode=${searchRequest.workStatusCode},
+                                       salesUserId=${searchRequest.salesUserId},
+                                       nearestStation=${searchRequest.nearestStation},
+                                       skillId=${searchRequest.skillId},
+                                       minExperienceMonths=${searchRequest.minExperienceMonths},
+                                       endWithinDays=${searchRequest.endWithinDays},
+                                       page=${pageNumber}
+                                   )}"
+                                   th:text="${pageNumber}">
+                                    1
+                                </a>
+                            </li>
+                        </th:block>
+
+
+                        <!-- 次へ -->
+                        <li class="page-item"
+                            th:classappend="${
+                                !searchResult.hasNext
+                                ? 'disabled'
+                                : ''
+                            }">
+
+                            <a class="page-link"
+                               th:href="@{/employees(
+                                   employeeNo=${searchRequest.employeeNo},
+                                   employeeName=${searchRequest.employeeName},
+                                   workStatusCode=${searchRequest.workStatusCode},
+                                   salesUserId=${searchRequest.salesUserId},
+                                   nearestStation=${searchRequest.nearestStation},
+                                   skillId=${searchRequest.skillId},
+                                   minExperienceMonths=${searchRequest.minExperienceMonths},
+                                   endWithinDays=${searchRequest.endWithinDays},
+                                   page=${searchResult.currentPage + 1}
+                               )}">
+                                次へ
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+    </main>
+
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

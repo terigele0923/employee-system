@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>従業員詳細 | 派遣管理システム</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" th:href="@{/dashboard}">
+                派遣管理システム
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a class="text-white text-decoration-none"
+                   th:href="@{/employees}">従業員一覧</a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit"
+                            class="btn btn-outline-light btn-sm">
+                        ログアウト
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <div th:if="${successMessage}"
+             class="alert alert-success"
+             th:text="${successMessage}"></div>
+
+        <div class="d-flex flex-wrap justify-content-between
+                    align-items-center gap-2 mb-4">
+            <div>
+                <h1 class="h3 mb-1">従業員詳細</h1>
+                <p class="text-secondary mb-0">
+                    基本情報、スキル、参画案件、面談履歴を確認します。
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary"
+                   th:href="@{/employees}">一覧へ戻る</a>
+                <a class="btn btn-primary"
+                   th:href="@{/employees/{id}/edit(id=${employee.employeeId})}">
+                    基本情報を編集
+                </a>
+                <form sec:authorize="hasRole('ADMIN')"
+                      th:action="@{/employees/{id}/delete(id=${employee.employeeId})}"
+                      method="post"
+                      onsubmit="return confirm('この従業員と関連するスキル、参画契約、面談、マッチング結果を削除します。よろしいですか？');">
+                    <button type="submit"
+                            class="btn btn-danger">
+                        削除
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <section class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h2 class="h5 mb-0">基本情報</h2>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">社員番号</dt>
+                    <dd class="col-sm-9" th:text="${employee.employeeNo}"></dd>
+                    <dt class="col-sm-3">氏名</dt>
+                    <dd class="col-sm-9" th:text="${employee.employeeName}"></dd>
+                    <dt class="col-sm-3">生年月日</dt>
+                    <dd class="col-sm-9"
+                        th:text="${#temporals.format(employee.birthDate, 'yyyy/MM/dd')}"></dd>
+                    <dt class="col-sm-3">電話番号</dt>
+                    <dd class="col-sm-9" th:text="${employee.phoneNo}"></dd>
+                    <dt class="col-sm-3">郵便番号</dt>
+                    <dd class="col-sm-9"
+                        th:text="${employee.postalCode ?: '－'}"></dd>
+                    <dt class="col-sm-3">住所</dt>
+                    <dd class="col-sm-9" th:text="${employee.address}"></dd>
+                    <dt class="col-sm-3">最寄駅</dt>
+                    <dd class="col-sm-9" th:text="${employee.nearestStation}"></dd>
+                    <dt class="col-sm-3">入社日</dt>
+                    <dd class="col-sm-9"
+                        th:text="${#temporals.format(employee.joinDate, 'yyyy/MM/dd')}"></dd>
+                    <dt class="col-sm-3">備考</dt>
+                    <dd class="col-sm-9"
+                        th:text="${employee.remarks ?: '－'}"></dd>
+                </dl>
+            </div>
+        </section>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-6">
+                <section class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white py-3
+                                d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">スキル</h2>
+                        <a class="btn btn-sm btn-primary disabled"
+                           aria-disabled="true">スキル追加（次工程）</a>
+                    </div>
+                    <div class="card-body text-secondary">
+                        SCR-006実装後、ここに複数のスキル明細を表示します。
+                    </div>
+                </section>
+            </div>
+            <div class="col-12 col-lg-6">
+                <section class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white py-3
+                                d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">参画案件</h2>
+                        <a class="btn btn-sm btn-primary disabled"
+                           aria-disabled="true">参画追加（次工程）</a>
+                    </div>
+                    <div class="card-body text-secondary">
+                        SCR-007実装後、ここに現在・過去の参画契約を表示します。
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

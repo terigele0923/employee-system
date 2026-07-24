@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <title th:text="${editMode} ? '従業員編集 | 派遣管理システム'
+                                      : '従業員新規登録 | 派遣管理システム'">
+        従業員登録・編集 | 派遣管理システム
+    </title>
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg
+                navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold"
+               th:href="@{/dashboard}">
+                派遣管理システム
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <a class="text-white text-decoration-none"
+                   th:href="@{/employees}">
+                    従業員一覧
+                </a>
+
+                <form th:action="@{/logout}"
+                      method="post">
+                    <button type="submit"
+                            class="btn btn-outline-light btn-sm">
+                        ログアウト
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+
+        <div class="mb-4">
+            <h1 class="h3 mb-1"
+                th:text="${editMode} ? '従業員編集' : '従業員新規登録'">
+                従業員登録・編集
+            </h1>
+            <p class="text-secondary mb-0"
+               th:text="${editMode}
+                        ? '従業員の基本情報を編集します。'
+                        : '必須項目を入力して従業員を登録します。'">
+                従業員の基本情報を入力します。
+            </p>
+        </div>
+
+        <form th:action="${editMode}
+                         ? @{/employees/{id}(id=${employeeId})}
+                         : @{/employees}"
+              th:object="${employeeCreateRequest}"
+              method="post"
+              novalidate>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h5 mb-0">基本情報</h2>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-danger"
+                         role="alert"
+                         th:if="${#fields.hasAnyErrors()}">
+                        入力内容を確認してください。
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-12 col-md-6">
+                            <label for="employeeNo"
+                                   class="form-label">
+                                社員番号
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   id="employeeNo"
+                                   class="form-control"
+                                   th:classappend="${editMode}
+                                                   ? 'bg-body-secondary'
+                                                   : (${#fields.hasErrors('employeeNo')}
+                                                      ? 'is-invalid'
+                                                      : '')"
+                                   th:field="*{employeeNo}"
+                                   th:readonly="${editMode}"
+                                   minlength="10"
+                                   maxlength="10"
+                                   pattern="E[A-Za-z0-9]{9}"
+                                   placeholder="例：E000000001">
+                            <div class="form-text"
+                                 th:if="${editMode}">
+                                社員番号は登録後に変更できません。
+                            </div>
+                            <div class="invalid-feedback"
+                                 th:errors="*{employeeNo}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="employeeName"
+                                   class="form-label">
+                                氏名
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   id="employeeName"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('employeeName')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{employeeName}"
+                                   maxlength="100">
+                            <div class="invalid-feedback"
+                                 th:errors="*{employeeName}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="birthDate"
+                                   class="form-label">
+                                生年月日
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   id="birthDate"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('birthDate')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{birthDate}">
+                            <div class="invalid-feedback"
+                                 th:errors="*{birthDate}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="phoneNo"
+                                   class="form-label">
+                                電話番号
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   id="phoneNo"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('phoneNo')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{phoneNo}"
+                                   maxlength="20"
+                                   placeholder="例：090-1234-5678">
+                            <div class="invalid-feedback"
+                                 th:errors="*{phoneNo}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="postalCode"
+                                   class="form-label">
+                                郵便番号
+                            </label>
+                            <input type="text"
+                                   id="postalCode"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('postalCode')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{postalCode}"
+                                   maxlength="8"
+                                   placeholder="例：123-4567">
+                            <div class="invalid-feedback"
+                                 th:errors="*{postalCode}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="nearestStation"
+                                   class="form-label">
+                                最寄駅
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   id="nearestStation"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('nearestStation')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{nearestStation}"
+                                   maxlength="100">
+                            <div class="invalid-feedback"
+                                 th:errors="*{nearestStation}">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="address"
+                                   class="form-label">
+                                住所
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   id="address"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('address')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{address}"
+                                   maxlength="200">
+                            <div class="invalid-feedback"
+                                 th:errors="*{address}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="joinDate"
+                                   class="form-label">
+                                入社日
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="date"
+                                   id="joinDate"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('joinDate')}
+                                                   ? 'is-invalid'"
+                                   th:field="*{joinDate}">
+                            <div class="invalid-feedback"
+                                 th:errors="*{joinDate}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="salesUserId"
+                                   class="form-label">
+                                担当営業
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select id="salesUserId"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('salesUserId')}
+                                                    ? 'is-invalid'"
+                                    th:field="*{salesUserId}">
+                                <option value="">選択してください</option>
+                                <option th:each="salesUser : ${salesUsers}"
+                                        th:value="${salesUser.userId}"
+                                        th:text="${salesUser.userName}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback"
+                                 th:errors="*{salesUserId}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="employmentStatus"
+                                   class="form-label">
+                                在籍状態
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select id="employmentStatus"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('employmentStatus')}
+                                                    ? 'is-invalid'"
+                                    th:field="*{employmentStatus}">
+                                <option value="01">在籍中</option>
+                                <option value="02">休職中</option>
+                                <option value="09">退職済み</option>
+                            </select>
+                            <div class="invalid-feedback"
+                                 th:errors="*{employmentStatus}">
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="workStatus"
+                                   class="form-label">
+                                稼働状態
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select id="workStatus"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('workStatus')}
+                                                    ? 'is-invalid'"
+                                    th:field="*{workStatus}">
+                                <option value="01">待機中</option>
+                                <option value="02">面談調整中</option>
+                                <option value="03">稼働中</option>
+                                <option value="04">休職中</option>
+                                <option value="09">退職済み</option>
+                            </select>
+                            <div class="invalid-feedback"
+                                 th:errors="*{workStatus}">
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="remarks"
+                                   class="form-label">
+                                備考
+                            </label>
+                            <textarea id="remarks"
+                                      class="form-control"
+                                      th:classappend="${#fields.hasErrors('remarks')}
+                                                      ? 'is-invalid'"
+                                      th:field="*{remarks}"
+                                      maxlength="500"
+                                      rows="4"></textarea>
+                            <div class="invalid-feedback"
+                                 th:errors="*{remarks}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white py-3">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a class="btn btn-outline-secondary"
+                           th:href="${editMode}
+                                    ? @{/employees/{id}(id=${employeeId})}
+                                    : @{/employees}">
+                            キャンセル
+                        </a>
+                        <button type="submit"
+                                class="btn btn-primary"
+                                th:text="${editMode} ? '更新' : '登録'">
+                            保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
