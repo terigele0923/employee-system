@@ -1,0 +1,28 @@
+services:
+  spring_employee_dev:
+    image: eclipse-temurin:21-jdk
+    container_name: spring_employee
+
+    working_dir: /app
+
+    volumes:
+      - .:/app
+      - maven-cache:/root/.m2
+
+    command: ./mvnw spring-boot:run
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+    networks:
+      - employee_network
+
+volumes:
+  maven-cache:
+
+networks:
+  employee_network:
+    external: true
