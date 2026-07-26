@@ -5,19 +5,53 @@
 
 <mapper namespace="com.example.employee_system.infrastructure.mapper.EmployeeMapper">
 
-    <!-- 待機中従業員数を取得する -->
-    <select id="countWaitingEmployees" resultType="long">
+    <select id="countWaitingEmployees"
+            resultType="long">
 
         SELECT
             COUNT(*)
         FROM employees e
         WHERE e.employment_status = '01'
-            AND e.work_status = '01'
-            AND e.deleted_at IS NULL
+          AND e.work_status = '01'
+          AND e.deleted_at IS NULL
 
-            <if test="salesUserId != null">
-                AND e.sales_user_id = #{salesUserId}
-            </if>
+        <if test="salesUserId != null">
+            AND e.sales_user_id = #{salesUserId}
+        </if>
+
+    </select>
+
+    <select id="findEmployees"
+            resultType="com.example.employee_system.presentation.response.EmployeeSummaryResponse">
+
+        SELECT
+            e.employee_id AS employeeId,
+            e.employee_no AS employeeNo,
+            e.employee_name AS employeeName,
+            e.nearest_station AS nearestStation,
+            e.employment_status AS employmentStatus,
+            e.work_status AS workStatus,
+            u.user_name AS salesUserName
+        FROM employees e
+        INNER JOIN users u
+            ON u.user_id = e.sales_user_id
+        WHERE e.deleted_at IS NULL
+
+        <if test="employmentStatus != null and employmentStatus != ''">
+            AND e.employment_status = #{employmentStatus}
+        </if>
+
+        <if test="workStatus != null and workStatus != ''">
+            AND e.work_status = #{workStatus}
+        </if>
+
+        <if test="salesUserId != null">
+            AND e.sales_user_id = #{salesUserId}
+        </if>
+
+        ORDER BY
+            e.employee_no ASC
+
     </select>
 
 </mapper>
