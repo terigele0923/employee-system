@@ -2,9 +2,11 @@ package com.example.employee_system.domain.repository;
 
 import java.util.List;
 
+import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
+import com.example.employee_system.presentation.response.SalesUserOptionResponse;
 
 public interface EmployeeRepository {
 
@@ -28,4 +30,13 @@ public interface EmployeeRepository {
     int deleteEmployee(
             Long employeeId,
             Long updatedBy);
+
+    List<SalesUserOptionResponse> findSalesUsers();
+
+    boolean existsByEmployeeNo(
+            String employeeNo);
+
+    int insertEmployee(
+            EmployeeCreateRequest request,
+            Long createdBy);
 }

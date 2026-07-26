@@ -30,11 +30,27 @@
             e.employee_name AS employeeName,
             e.nearest_station AS nearestStation,
             e.employment_status AS employmentStatus,
+            COALESCE(
+                employment_code.code_name,
+                '不明'
+            ) AS employmentStatusName,
             e.work_status AS workStatus,
+            COALESCE(
+                work_code.code_name,
+                '不明'
+            ) AS workStatusName,
             u.user_name AS salesUserName
         FROM employees e
         INNER JOIN users u
             ON u.user_id = e.sales_user_id
+        LEFT JOIN common_codes employment_code
+            ON employment_code.code_type = 'EMPLOYMENT_STATUS'
+           AND employment_code.code_value = e.employment_status
+           AND employment_code.is_active = TRUE
+        LEFT JOIN common_codes work_code
+            ON work_code.code_type = 'WORK_STATUS'
+           AND work_code.code_value = e.work_status
+           AND work_code.is_active = TRUE
         WHERE e.deleted_at IS NULL
 
         <if test="employmentStatus != null and employmentStatus != ''">
@@ -68,12 +84,28 @@
             e.nearest_station AS nearestStation,
             e.join_date AS joinDate,
             e.employment_status AS employmentStatus,
+            COALESCE(
+                employment_code.code_name,
+                '不明'
+            ) AS employmentStatusName,
             e.work_status AS workStatus,
+            COALESCE(
+                work_code.code_name,
+                '不明'
+            ) AS workStatusName,
             e.remarks AS remarks,
             u.user_name AS salesUserName
         FROM employees e
         INNER JOIN users u
             ON u.user_id = e.sales_user_id
+        LEFT JOIN common_codes employment_code
+            ON employment_code.code_type = 'EMPLOYMENT_STATUS'
+           AND employment_code.code_value = e.employment_status
+           AND employment_code.is_active = TRUE
+        LEFT JOIN common_codes work_code
+            ON work_code.code_type = 'WORK_STATUS'
+           AND work_code.code_value = e.work_status
+           AND work_code.is_active = TRUE
         WHERE e.employee_id = #{employeeId}
           AND e.deleted_at IS NULL
 
@@ -119,5 +151,75 @@
           AND deleted_at IS NULL
 
     </update>
+
+    <select id="findSalesUsers"
+            resultType="com.example.employee_system.presentation.response.SalesUserOptionResponse">
+
+        SELECT
+            u.user_id AS userId,
+            u.user_name AS userName
+        FROM users u
+        INNER JOIN roles r
+            ON r.role_id = u.role_id
+        WHERE r.role_code = 'SALES'
+          AND u.is_active = TRUE
+          AND u.deleted_at IS NULL
+        ORDER BY
+            u.user_name ASC
+
+    </select>
+
+    <select id="countByEmployeeNo"
+            resultType="long">
+
+        SELECT
+            COUNT(*)
+        FROM employees
+        WHERE employee_no = #{employeeNo}
+
+    </select>
+
+    <insert id="insertEmployee"
+            useGeneratedKeys="true"
+            keyProperty="request.employeeId"
+            keyColumn="employee_id">
+
+        INSERT INTO employees (
+            employee_no,
+            employee_name,
+            birth_date,
+            phone_no,
+            postal_code,
+            address,
+            nearest_station,
+            join_date,
+            employment_status,
+            work_status,
+            sales_user_id,
+            remarks,
+            created_at,
+            created_by,
+            updated_at,
+            updated_by
+        ) VALUES (
+            #{request.employeeNo},
+            #{request.employeeName},
+            #{request.birthDate},
+            #{request.phoneNo},
+            #{request.postalCode},
+            #{request.address},
+            #{request.nearestStation},
+            #{request.joinDate},
+            #{request.employmentStatus},
+            #{request.workStatus},
+            #{request.salesUserId},
+            #{request.remarks},
+            CURRENT_TIMESTAMP,
+            #{createdBy},
+            CURRENT_TIMESTAMP,
+            #{createdBy}
+        )
+
+    </insert>
 
 </mapper>

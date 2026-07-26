@@ -1,23 +1,61 @@
-package com.example.employee_system.presentation.response;
+package com.example.employee_system.presentation.request;
 
 import java.time.LocalDate;
 
-public class EmployeeDetailResponse {
+import org.springframework.format.annotation.DateTimeFormat;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+public class EmployeeCreateRequest {
 
     private Long employeeId;
+
+    @NotBlank
+    @Pattern(regexp = "^E[0-9]{9}$")
     private String employeeNo;
+
+    @NotBlank
+    @Size(max = 100)
     private String employeeName;
+
+    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthDate;
+
+    @NotBlank
+    @Size(max = 20)
     private String phoneNo;
+
+    @Size(max = 8)
     private String postalCode;
+
+    @NotBlank
+    @Size(max = 200)
     private String address;
+
+    @NotBlank
+    @Size(max = 100)
     private String nearestStation;
+
+    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate joinDate;
-    private String employmentStatus;
-    private String employmentStatusName;
-    private String workStatus;
-    private String workStatusName;
-    private String salesUserName;
+
+    @NotBlank
+    @Pattern(regexp = "^[0-9]{2}$")
+    private String employmentStatus = "01";
+
+    @NotBlank
+    @Pattern(regexp = "^[0-9]{2}$")
+    private String workStatus = "01";
+
+    @NotNull
+    private Long salesUserId;
+
+    @Size(max = 500)
     private String remarks;
 
     public Long getEmployeeId() {
@@ -100,17 +138,6 @@ public class EmployeeDetailResponse {
         this.employmentStatus = employmentStatus;
     }
 
-    public String getEmploymentStatusName() {
-        return employmentStatusName;
-    }
-
-    public void setEmploymentStatusName(
-            String employmentStatusName) {
-
-        this.employmentStatusName =
-                employmentStatusName;
-    }
-
     public String getWorkStatus() {
         return workStatus;
     }
@@ -119,23 +146,12 @@ public class EmployeeDetailResponse {
         this.workStatus = workStatus;
     }
 
-    public String getWorkStatusName() {
-        return workStatusName;
+    public Long getSalesUserId() {
+        return salesUserId;
     }
 
-    public void setWorkStatusName(
-            String workStatusName) {
-
-        this.workStatusName =
-                workStatusName;
-    }
-
-    public String getSalesUserName() {
-        return salesUserName;
-    }
-
-    public void setSalesUserName(String salesUserName) {
-        this.salesUserName = salesUserName;
+    public void setSalesUserId(Long salesUserId) {
+        this.salesUserId = salesUserId;
     }
 
     public String getRemarks() {

@@ -6,9 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import com.example.employee_system.domain.repository.EmployeeRepository;
 import com.example.employee_system.infrastructure.mapper.EmployeeMapper;
+import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
+import com.example.employee_system.presentation.response.SalesUserOptionResponse;
 
 @Repository
 public class MyBatisEmployeeRepository
@@ -74,6 +76,29 @@ public class MyBatisEmployeeRepository
         return employeeMapper.deleteEmployee(
                 employeeId,
                 updatedBy);
+    }
+
+    @Override
+    public List<SalesUserOptionResponse> findSalesUsers() {
+        return employeeMapper.findSalesUsers();
+    }
+
+    @Override
+    public boolean existsByEmployeeNo(
+            String employeeNo) {
+
+        return employeeMapper.countByEmployeeNo(
+                employeeNo) > 0;
+    }
+
+    @Override
+    public int insertEmployee(
+            EmployeeCreateRequest request,
+            Long createdBy) {
+
+        return employeeMapper.insertEmployee(
+                request,
+                createdBy);
     }
 }
 

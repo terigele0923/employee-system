@@ -2,10 +2,13 @@ package com.example.employee_system.presentation.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,21 +16,27 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.employee_system.application.service.CodeService;
 import com.example.employee_system.application.service.EmployeeService;
 import com.example.employee_system.infrastructure.security.LoginUserDetails;
+import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
+import com.example.employee_system.presentation.response.SalesUserOptionResponse;
 
 @Controller
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final CodeService codeService;
 
     public EmployeeController(
-            EmployeeService employeeService) {
+            EmployeeService employeeService,
+            CodeService codeService) {
 
         this.employeeService = employeeService;
+        this.codeService = codeService;
     }
 
     @GetMapping("/employees")
@@ -148,6 +157,8 @@ public class EmployeeController {
                 "employeeUpdateRequest",
                 request);
 
+        addCodeOptions(model);
+
         return "employee-edit";
     }
 
@@ -162,6 +173,14 @@ public class EmployeeController {
 
         Long salesUserId =
                 resolveSalesUserId(loginUser);
+
+        validateCodeOrThrow(
+                CodeService.EMPLOYMENT_STATUS,
+                employeeUpdateRequest.getEmploymentStatus());
+
+        validateCodeOrThrow(
+                CodeService.WORK_STATUS,
+                employeeUpdateRequest.getWorkStatus());
 
         boolean updated =
                 employeeService.updateEmployee(
@@ -205,6 +224,109 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+    @GetMapping("/employees/new")
+    public String newEmployee(
+            @AuthenticationPrincipal
+            LoginUserDetails loginUser,
+            Model model) {
+
+        model.addAttribute(
+                "loginUser",
+                loginUser.getUser());
+
+        model.addAttribute(
+                "employeeCreateRequest",
+                new EmployeeCreateRequest());
+
+        model.addAttribute(
+                "salesUsers",
+                resolveSelectableSalesUsers(
+                        loginUser));
+
+        addCodeOptions(model);
+
+        return "employee-new";
+    }
+
+    @PostMapping("/employees")
+    public String createEmployee(
+            @Valid
+            @ModelAttribute
+            EmployeeCreateRequest employeeCreateRequest,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal
+            LoginUserDetails loginUser,
+            Model model) {
+
+        List<SalesUserOptionResponse> salesUsers =
+                resolveSelectableSalesUsers(
+                        loginUser);
+
+        boolean validSalesUser =
+                employeeCreateRequest.getSalesUserId() != null
+                && salesUsers.stream().anyMatch(
+                        salesUser -> salesUser.getUserId().equals(
+                                employeeCreateRequest.getSalesUserId()));
+
+        if (!validSalesUser) {
+            bindingResult.rejectValue(
+                    "salesUserId",
+                    "invalid",
+                    "営業担当者を選択してください。");
+        }
+
+        if (!codeService.exists(
+                CodeService.EMPLOYMENT_STATUS,
+                employeeCreateRequest.getEmploymentStatus())) {
+
+            bindingResult.rejectValue(
+                    "employmentStatus",
+                    "invalid",
+                    "在籍状態を選択してください。");
+        }
+
+        if (!codeService.exists(
+                CodeService.WORK_STATUS,
+                employeeCreateRequest.getWorkStatus())) {
+
+            bindingResult.rejectValue(
+                    "workStatus",
+                    "invalid",
+                    "稼働状態を選択してください。");
+        }
+
+        if (employeeCreateRequest.getEmployeeNo() != null
+                && employeeService.existsByEmployeeNo(
+                        employeeCreateRequest.getEmployeeNo())) {
+
+            bindingResult.rejectValue(
+                    "employeeNo",
+                    "duplicate",
+                    "この従業員番号はすでに使用されています。");
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute(
+                    "loginUser",
+                    loginUser.getUser());
+
+            model.addAttribute(
+                    "salesUsers",
+                    salesUsers);
+
+            addCodeOptions(model);
+
+            return "employee-new";
+        }
+
+        Long employeeId =
+                employeeService.createEmployee(
+                        employeeCreateRequest,
+                        loginUser.getUser().getUserId());
+
+        return "redirect:/employees/" + employeeId;
+    }
+
     private Long resolveSalesUserId(
             LoginUserDetails loginUser) {
 
@@ -215,6 +337,53 @@ public class EmployeeController {
         }
 
         return null;
+    }
+
+    private List<SalesUserOptionResponse>
+            resolveSelectableSalesUsers(
+                    LoginUserDetails loginUser) {
+
+        List<SalesUserOptionResponse> salesUsers =
+                employeeService.findSalesUsers();
+
+        if (!"SALES".equals(
+                loginUser.getUser().getRoleCode())) {
+
+            return salesUsers;
+        }
+
+        return salesUsers.stream()
+                .filter(salesUser ->
+                        salesUser.getUserId().equals(
+                                loginUser.getUser().getUserId()))
+                .toList();
+    }
+
+    private void addCodeOptions(
+            Model model) {
+
+        model.addAttribute(
+                "employmentStatuses",
+                codeService.findByType(
+                        CodeService.EMPLOYMENT_STATUS));
+
+        model.addAttribute(
+                "workStatuses",
+                codeService.findByType(
+                        CodeService.WORK_STATUS));
+    }
+
+    private void validateCodeOrThrow(
+            String codeType,
+            String codeValue) {
+
+        if (!codeService.exists(
+                codeType,
+                codeValue)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
     private EmployeeUpdateRequest createUpdateRequest(

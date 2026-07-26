@@ -16,7 +16,8 @@
 			u.email AS email,
 			u.password_hash AS passwordHash,
 			u.is_active AS active,
-			r.role_code AS roleCode
+			r.role_code AS roleCode,
+			r.role_name AS roleName
 		FROM users u
 		INNER JOIN roles r
 			ON r.role_id = u.role_id

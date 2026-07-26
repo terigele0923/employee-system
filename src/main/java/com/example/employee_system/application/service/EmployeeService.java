@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.employee_system.domain.repository.EmployeeRepository;
+import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
+import com.example.employee_system.presentation.response.SalesUserOptionResponse;
 
 @Service
 public class EmployeeService {
@@ -63,5 +65,33 @@ public class EmployeeService {
         return employeeRepository.deleteEmployee(
                 employeeId,
                 updatedBy) == 1;
+    }
+
+    public List<SalesUserOptionResponse> findSalesUsers() {
+        return employeeRepository.findSalesUsers();
+    }
+
+    public boolean existsByEmployeeNo(
+            String employeeNo) {
+
+        return employeeRepository.existsByEmployeeNo(
+                employeeNo);
+    }
+
+    @Transactional
+    public Long createEmployee(
+            EmployeeCreateRequest request,
+            Long createdBy) {
+
+        int inserted =
+                employeeRepository.insertEmployee(
+                        request,
+                        createdBy);
+
+        if (inserted != 1) {
+            throw new IllegalStateException();
+        }
+
+        return request.getEmployeeId();
     }
 }

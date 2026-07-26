@@ -10,6 +10,7 @@ public class User {
 	private String passwordHash;
 	private Boolean active;
 	private String roleCode;
+	private String roleName;
 
 	public Long getUserId() {
 		return userId;
@@ -73,5 +74,13 @@ public class User {
 
 	public void setRoleCode(String roleCode) {
 		this.roleCode = roleCode;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
 	}
 }

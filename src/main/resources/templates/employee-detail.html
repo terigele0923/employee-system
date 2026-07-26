@@ -147,14 +147,10 @@
                     <div class="col-12 col-md-6">
                         <div class="text-secondary small mb-1">雇用状態</div>
                         <div>
-                            <span th:if="${employee.employmentStatus == '01'}"
-                                  class="badge text-bg-success">
-                                在籍
-                            </span>
-                            <span th:unless="${employee.employmentStatus == '01'}"
-                                  th:text="${employee.employmentStatus}"
-                                  class="badge text-bg-secondary">
-                                状態
+                            <span th:text="${employee.employmentStatusName}"
+                                  class="badge"
+                                  th:classappend="${employee.employmentStatus == '01'} ? 'text-bg-success' : 'text-bg-secondary'">
+                                在籍状態
                             </span>
                         </div>
                     </div>
@@ -162,14 +158,10 @@
                     <div class="col-12 col-md-6">
                         <div class="text-secondary small mb-1">稼働状態</div>
                         <div>
-                            <span th:if="${employee.workStatus == '01'}"
-                                  class="badge text-bg-warning">
-                                待機中
-                            </span>
-                            <span th:unless="${employee.workStatus == '01'}"
-                                  th:text="${employee.workStatus}"
-                                  class="badge text-bg-secondary">
-                                状態
+                            <span th:text="${employee.workStatusName}"
+                                  class="badge"
+                                  th:classappend="${employee.workStatus == '01'} ? 'text-bg-warning' : 'text-bg-primary'">
+                                稼働状態
                             </span>
                         </div>
                     </div>

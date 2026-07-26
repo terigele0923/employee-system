@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
-    <title>従業員編集 | 社員管理システム</title>
+    <title>従業員新規登録 | 社員管理システム</title>
     <link rel="stylesheet"
           th:href="@{/css/bootstrap.min.css}">
 </head>
@@ -40,30 +40,38 @@
 
     <main class="container-fluid px-4 py-4">
         <div class="mb-4">
-            <h1 class="h3 mb-1">従業員編集</h1>
-            <p class="text-secondary mb-0"
-               th:text="${employee.employeeNo}">
-                E000000001
+            <h1 class="h3 mb-1">従業員新規登録</h1>
+            <p class="text-secondary mb-0">
+                従業員の基本情報を入力してください。
             </p>
         </div>
 
-        <form th:action="@{/employees/{employeeId}/edit(
-                    employeeId=${employee.employeeId}
-              )}"
-              th:object="${employeeUpdateRequest}"
+        <form th:action="@{/employees}"
+              th:object="${employeeCreateRequest}"
               method="post">
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
-                            <label class="form-label">
+                            <label for="employeeNo"
+                                   class="form-label">
                                 従業員番号
                             </label>
                             <input type="text"
+                                   id="employeeNo"
                                    class="form-control"
-                                   th:value="${employee.employeeNo}"
-                                   disabled>
+                                   th:classappend="${#fields.hasErrors('employeeNo')} ? 'is-invalid'"
+                                   th:field="*{employeeNo}"
+                                   maxlength="10"
+                                   pattern="E[0-9]{9}"
+                                   placeholder="E000000001"
+                                   required>
+                            <div class="invalid-feedback"
+                                 th:if="${#fields.hasErrors('employeeNo')}"
+                                 th:errors="*{employeeNo}">
+                                従業員番号を確認してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -74,9 +82,14 @@
                             <input type="text"
                                    id="employeeName"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('employeeName')} ? 'is-invalid'"
                                    th:field="*{employeeName}"
                                    maxlength="100"
                                    required>
+                            <div class="invalid-feedback"
+                                 th:errors="*{employeeName}">
+                                氏名を入力してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -87,8 +100,13 @@
                             <input type="date"
                                    id="birthDate"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('birthDate')} ? 'is-invalid'"
                                    th:field="*{birthDate}"
                                    required>
+                            <div class="invalid-feedback"
+                                 th:errors="*{birthDate}">
+                                生年月日を入力してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -99,9 +117,14 @@
                             <input type="text"
                                    id="phoneNo"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('phoneNo')} ? 'is-invalid'"
                                    th:field="*{phoneNo}"
                                    maxlength="20"
                                    required>
+                            <div class="invalid-feedback"
+                                 th:errors="*{phoneNo}">
+                                電話番号を入力してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -112,8 +135,13 @@
                             <input type="text"
                                    id="postalCode"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('postalCode')} ? 'is-invalid'"
                                    th:field="*{postalCode}"
                                    maxlength="8">
+                            <div class="invalid-feedback"
+                                 th:errors="*{postalCode}">
+                                郵便番号を確認してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -124,9 +152,14 @@
                             <input type="text"
                                    id="address"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'"
                                    th:field="*{address}"
                                    maxlength="200"
                                    required>
+                            <div class="invalid-feedback"
+                                 th:errors="*{address}">
+                                住所を入力してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -137,9 +170,14 @@
                             <input type="text"
                                    id="nearestStation"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('nearestStation')} ? 'is-invalid'"
                                    th:field="*{nearestStation}"
                                    maxlength="100"
                                    required>
+                            <div class="invalid-feedback"
+                                 th:errors="*{nearestStation}">
+                                最寄駅を入力してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -150,8 +188,13 @@
                             <input type="date"
                                    id="joinDate"
                                    class="form-control"
+                                   th:classappend="${#fields.hasErrors('joinDate')} ? 'is-invalid'"
                                    th:field="*{joinDate}"
                                    required>
+                            <div class="invalid-feedback"
+                                 th:errors="*{joinDate}">
+                                入社日を入力してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -161,6 +204,7 @@
                             </label>
                             <select id="employmentStatus"
                                     class="form-select"
+                                    th:classappend="${#fields.hasErrors('employmentStatus')} ? 'is-invalid'"
                                     th:field="*{employmentStatus}"
                                     required>
                                 <option th:each="status : ${employmentStatuses}"
@@ -169,6 +213,10 @@
                                     在籍状態
                                 </option>
                             </select>
+                            <div class="invalid-feedback"
+                                 th:errors="*{employmentStatus}">
+                                在籍状態を選択してください。
+                            </div>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -178,6 +226,7 @@
                             </label>
                             <select id="workStatus"
                                     class="form-select"
+                                    th:classappend="${#fields.hasErrors('workStatus')} ? 'is-invalid'"
                                     th:field="*{workStatus}"
                                     required>
                                 <option th:each="status : ${workStatuses}"
@@ -186,6 +235,33 @@
                                     稼働状態
                                 </option>
                             </select>
+                            <div class="invalid-feedback"
+                                 th:errors="*{workStatus}">
+                                稼働状態を選択してください。
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="salesUserId"
+                                   class="form-label">
+                                営業担当者
+                            </label>
+                            <select id="salesUserId"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('salesUserId')} ? 'is-invalid'"
+                                    th:field="*{salesUserId}"
+                                    required>
+                                <option value="">選択してください</option>
+                                <option th:each="salesUser : ${salesUsers}"
+                                        th:value="${salesUser.userId}"
+                                        th:text="${salesUser.userName}">
+                                    営業担当者
+                                </option>
+                            </select>
+                            <div class="invalid-feedback"
+                                 th:errors="*{salesUserId}">
+                                営業担当者を選択してください。
+                            </div>
                         </div>
 
                         <div class="col-12">
@@ -195,24 +271,27 @@
                             </label>
                             <textarea id="remarks"
                                       class="form-control"
+                                      th:classappend="${#fields.hasErrors('remarks')} ? 'is-invalid'"
                                       th:field="*{remarks}"
                                       maxlength="500"
                                       rows="4"></textarea>
+                            <div class="invalid-feedback"
+                                 th:errors="*{remarks}">
+                                備考を確認してください。
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-footer bg-white d-flex justify-content-end gap-2 px-4 py-3">
                     <a class="btn btn-outline-secondary"
-                       th:href="@{/employees/{employeeId}(
-                            employeeId=${employee.employeeId}
-                       )}">
+                       th:href="@{/employees}">
                         キャンセル
                     </a>
 
                     <button type="submit"
-                            class="btn btn-primary">
-                        更新
+                            class="btn btn-success">
+                        登録
                     </button>
                 </div>
             </div>

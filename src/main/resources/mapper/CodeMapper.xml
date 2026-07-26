@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.employee_system.infrastructure.mapper.CodeMapper">
+
+    <select id="findByType"
+            resultType="com.example.employee_system.presentation.response.CodeOptionResponse">
+
+        SELECT
+            code_value AS codeValue,
+            code_name AS codeName
+        FROM common_codes
+        WHERE code_type = #{codeType}
+          AND is_active = TRUE
+        ORDER BY
+            display_order ASC,
+            code_value ASC
+
+    </select>
+
+    <select id="countByTypeAndValue"
+            resultType="long">
+
+        SELECT
+            COUNT(*)
+        FROM common_codes
+        WHERE code_type = #{codeType}
+          AND code_value = #{codeValue}
+          AND is_active = TRUE
+
+    </select>
+
+</mapper>

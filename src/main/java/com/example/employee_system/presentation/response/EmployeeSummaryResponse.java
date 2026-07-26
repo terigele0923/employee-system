@@ -7,7 +7,9 @@ public class EmployeeSummaryResponse {
     private String employeeName;
     private String nearestStation;
     private String employmentStatus;
+    private String employmentStatusName;
     private String workStatus;
+    private String workStatusName;
     private String salesUserName;
 
     public Long getEmployeeId() {
@@ -50,12 +52,34 @@ public class EmployeeSummaryResponse {
         this.employmentStatus = employmentStatus;
     }
 
+    public String getEmploymentStatusName() {
+        return employmentStatusName;
+    }
+
+    public void setEmploymentStatusName(
+            String employmentStatusName) {
+
+        this.employmentStatusName =
+                employmentStatusName;
+    }
+
     public String getWorkStatus() {
         return workStatus;
     }
 
     public void setWorkStatus(String workStatus) {
         this.workStatus = workStatus;
+    }
+
+    public String getWorkStatusName() {
+        return workStatusName;
+    }
+
+    public void setWorkStatusName(
+            String workStatusName) {
+
+        this.workStatusName =
+                workStatusName;
     }
 
     public String getSalesUserName() {

@@ -5,9 +5,11 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
+import com.example.employee_system.presentation.response.SalesUserOptionResponse;
 
 @Mapper
 public interface EmployeeMapper {
@@ -33,4 +35,13 @@ public interface EmployeeMapper {
     int deleteEmployee(
             @Param("employeeId") Long employeeId,
             @Param("updatedBy") Long updatedBy);
+
+    List<SalesUserOptionResponse> findSalesUsers();
+
+    long countByEmployeeNo(
+            @Param("employeeNo") String employeeNo);
+
+    int insertEmployee(
+            @Param("request") EmployeeCreateRequest request,
+            @Param("createdBy") Long createdBy);
 }
