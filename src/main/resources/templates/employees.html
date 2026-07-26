@@ -75,8 +75,14 @@
                                     th:text="${employee.employeeNo}">
                                     E000000001
                                 </td>
-                                <td th:text="${employee.employeeName}">
-                                    従業員名
+                                <td>
+                                    <a th:href="@{/employees/{employeeId}(
+                                            employeeId=${employee.employeeId}
+                                        )}"
+                                       th:text="${employee.employeeName}"
+                                       class="link-primary text-decoration-none fw-semibold">
+                                        従業員名
+                                    </a>
                                 </td>
                                 <td th:text="${employee.nearestStation}">
                                     最寄駅

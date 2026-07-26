@@ -54,4 +54,70 @@
 
     </select>
 
+    <select id="findEmployeeById"
+            resultType="com.example.employee_system.presentation.response.EmployeeDetailResponse">
+
+        SELECT
+            e.employee_id AS employeeId,
+            e.employee_no AS employeeNo,
+            e.employee_name AS employeeName,
+            e.birth_date AS birthDate,
+            e.phone_no AS phoneNo,
+            e.postal_code AS postalCode,
+            e.address AS address,
+            e.nearest_station AS nearestStation,
+            e.join_date AS joinDate,
+            e.employment_status AS employmentStatus,
+            e.work_status AS workStatus,
+            e.remarks AS remarks,
+            u.user_name AS salesUserName
+        FROM employees e
+        INNER JOIN users u
+            ON u.user_id = e.sales_user_id
+        WHERE e.employee_id = #{employeeId}
+          AND e.deleted_at IS NULL
+
+        <if test="salesUserId != null">
+            AND e.sales_user_id = #{salesUserId}
+        </if>
+
+    </select>
+
+    <update id="updateEmployee">
+
+        UPDATE employees
+        SET
+            employee_name = #{request.employeeName},
+            birth_date = #{request.birthDate},
+            phone_no = #{request.phoneNo},
+            postal_code = #{request.postalCode},
+            address = #{request.address},
+            nearest_station = #{request.nearestStation},
+            join_date = #{request.joinDate},
+            employment_status = #{request.employmentStatus},
+            work_status = #{request.workStatus},
+            remarks = #{request.remarks},
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{updatedBy}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+
+        <if test="salesUserId != null">
+            AND sales_user_id = #{salesUserId}
+        </if>
+
+    </update>
+
+    <update id="deleteEmployee">
+
+        UPDATE employees
+        SET
+            deleted_at = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{updatedBy}
+        WHERE employee_id = #{employeeId}
+          AND deleted_at IS NULL
+
+    </update>
+
 </mapper>

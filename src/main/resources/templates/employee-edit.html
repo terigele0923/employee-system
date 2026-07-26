@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <title>従業員編集 | 社員管理システム</title>
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-light">
+
+    <header class="navbar navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand mb-0 h1 text-decoration-none"
+               th:href="@{/dashboard}">
+                社員管理システム
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-white">
+                    <span th:text="${loginUser.userName}">
+                        ユーザー名
+                    </span>
+                    さん
+                </span>
+
+                <form th:action="@{/logout}"
+                      method="post">
+                    <button type="submit"
+                            class="btn btn-outline-light btn-sm">
+                        ログアウト
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-4 py-4">
+        <div class="mb-4">
+            <h1 class="h3 mb-1">従業員編集</h1>
+            <p class="text-secondary mb-0"
+               th:text="${employee.employeeNo}">
+                E000000001
+            </p>
+        </div>
+
+        <form th:action="@{/employees/{employeeId}/edit(
+                    employeeId=${employee.employeeId}
+              )}"
+              th:object="${employeeUpdateRequest}"
+              method="post">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">
+                                従業員番号
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:value="${employee.employeeNo}"
+                                   disabled>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="employeeName"
+                                   class="form-label">
+                                氏名
+                            </label>
+                            <input type="text"
+                                   id="employeeName"
+                                   class="form-control"
+                                   th:field="*{employeeName}"
+                                   maxlength="100"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="birthDate"
+                                   class="form-label">
+                                生年月日
+                            </label>
+                            <input type="date"
+                                   id="birthDate"
+                                   class="form-control"
+                                   th:field="*{birthDate}"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="phoneNo"
+                                   class="form-label">
+                                電話番号
+                            </label>
+                            <input type="text"
+                                   id="phoneNo"
+                                   class="form-control"
+                                   th:field="*{phoneNo}"
+                                   maxlength="20"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="postalCode"
+                                   class="form-label">
+                                郵便番号
+                            </label>
+                            <input type="text"
+                                   id="postalCode"
+                                   class="form-control"
+                                   th:field="*{postalCode}"
+                                   maxlength="8">
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="address"
+                                   class="form-label">
+                                住所
+                            </label>
+                            <input type="text"
+                                   id="address"
+                                   class="form-control"
+                                   th:field="*{address}"
+                                   maxlength="200"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="nearestStation"
+                                   class="form-label">
+                                最寄駅
+                            </label>
+                            <input type="text"
+                                   id="nearestStation"
+                                   class="form-control"
+                                   th:field="*{nearestStation}"
+                                   maxlength="100"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="joinDate"
+                                   class="form-label">
+                                入社日
+                            </label>
+                            <input type="date"
+                                   id="joinDate"
+                                   class="form-control"
+                                   th:field="*{joinDate}"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="employmentStatus"
+                                   class="form-label">
+                                雇用状態コード
+                            </label>
+                            <input type="text"
+                                   id="employmentStatus"
+                                   class="form-control"
+                                   th:field="*{employmentStatus}"
+                                   maxlength="2"
+                                   required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="workStatus"
+                                   class="form-label">
+                                稼働状態コード
+                            </label>
+                            <input type="text"
+                                   id="workStatus"
+                                   class="form-control"
+                                   th:field="*{workStatus}"
+                                   maxlength="2"
+                                   required>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="remarks"
+                                   class="form-label">
+                                備考
+                            </label>
+                            <textarea id="remarks"
+                                      class="form-control"
+                                      th:field="*{remarks}"
+                                      maxlength="500"
+                                      rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white d-flex justify-content-end gap-2 px-4 py-3">
+                    <a class="btn btn-outline-secondary"
+                       th:href="@{/employees/{employeeId}(
+                            employeeId=${employee.employeeId}
+                       )}">
+                        キャンセル
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        更新
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+
+</html>

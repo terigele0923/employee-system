@@ -3,8 +3,11 @@ package com.example.employee_system.application.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.employee_system.domain.repository.EmployeeRepository;
+import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
+import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
 
 @Service
@@ -27,5 +30,38 @@ public class EmployeeService {
                 employmentStatus,
                 workStatus,
                 salesUserId);
+    }
+
+    public EmployeeDetailResponse findEmployeeById(
+            Long employeeId,
+            Long salesUserId) {
+
+        return employeeRepository.findEmployeeById(
+                employeeId,
+                salesUserId);
+    }
+
+    @Transactional
+    public boolean updateEmployee(
+            Long employeeId,
+            EmployeeUpdateRequest request,
+            Long salesUserId,
+            Long updatedBy) {
+
+        return employeeRepository.updateEmployee(
+                employeeId,
+                request,
+                salesUserId,
+                updatedBy) == 1;
+    }
+
+    @Transactional
+    public boolean deleteEmployee(
+            Long employeeId,
+            Long updatedBy) {
+
+        return employeeRepository.deleteEmployee(
+                employeeId,
+                updatedBy) == 1;
     }
 }

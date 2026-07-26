@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import com.example.employee_system.domain.repository.EmployeeRepository;
 import com.example.employee_system.infrastructure.mapper.EmployeeMapper;
+import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
+import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
 
 @Repository
@@ -38,6 +40,40 @@ public class MyBatisEmployeeRepository
                 employmentStatus,
                 workStatus,
                 salesUserId);
+    }
+
+    @Override
+    public EmployeeDetailResponse findEmployeeById(
+            Long employeeId,
+            Long salesUserId) {
+
+        return employeeMapper.findEmployeeById(
+                employeeId,
+                salesUserId);
+    }
+
+    @Override
+    public int updateEmployee(
+            Long employeeId,
+            EmployeeUpdateRequest request,
+            Long salesUserId,
+            Long updatedBy) {
+
+        return employeeMapper.updateEmployee(
+                employeeId,
+                request,
+                salesUserId,
+                updatedBy);
+    }
+
+    @Override
+    public int deleteEmployee(
+            Long employeeId,
+            Long updatedBy) {
+
+        return employeeMapper.deleteEmployee(
+                employeeId,
+                updatedBy);
     }
 }
 
