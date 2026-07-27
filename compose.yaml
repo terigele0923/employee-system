@@ -1,5 +1,5 @@
 services:
-  spring_employee:
+  spring_employee_dev:
     image: eclipse-temurin:21-jdk
     container_name: spring_employee
 
@@ -9,10 +9,7 @@ services:
       - .:/app
       - maven-cache:/root/.m2
 
-    command:
-      - sh
-      - -c
-      - chmod +x mvnw && ./mvnw spring-boot:run
+    command: ./mvnw spring-boot:run
 
     ports:
       - "8080:8080"
@@ -20,48 +17,12 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
 
-    depends_on:
-      spring_db:
-        condition: service_healthy
-
-    networks:
-      - employee_network
-
-  spring_db:
-    image: mysql:8.0
-    container_name: spring_db
-
-    ports:
-      - "3307:3306"
-
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: employee_db
-      MYSQL_USER: terigele
-      MYSQL_PASSWORD: 123456
-      TZ: Asia/Tokyo
-
-    volumes:
-      - mysql-data:/var/lib/mysql
-
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - mysqladmin ping -h localhost -u root -proot
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 20s
-
-    restart: unless-stopped
-
     networks:
       - employee_network
 
 volumes:
   maven-cache:
-  mysql-data:
 
 networks:
   employee_network:
-    driver: bridge
+    external: true
