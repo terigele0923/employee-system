@@ -21,11 +21,14 @@ public class DashboardService {
         long waitingEmployeeCount = employeeRepository.countWaitingEmployees(salesUserId);
         
         long activeEmployeeCount  = employeeRepository.countActiveEmployees(salesUserId);
+        
+        long endingSoonEmployeeCount = employeeRepository.countEndinSoonEmployees(salesUserId);
 
         DashboardResponse response = new DashboardResponse();
 
         response.setWaitingEmployeeCount(waitingEmployeeCount);
         response.setActiveEmployeeCount(activeEmployeeCount);
+        response.setEndingSoonCount(endingSoonEmployeeCount);
 
         return response;
     }

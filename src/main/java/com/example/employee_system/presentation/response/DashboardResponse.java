@@ -4,8 +4,17 @@ public class DashboardResponse {
     
     private long waitingEmployeeCount;
     private long activeEmployeeCount;
+    private long endingSoonEmployeeCount;
     
-    public long getWaitingEmployeeCount(){
+    public long getEndingSoonEmployeeCount() {
+		return endingSoonEmployeeCount;
+	}
+
+	public void setEndingSoonCount(long endingSoonEmployeeCount) {
+		this.endingSoonEmployeeCount = endingSoonEmployeeCount;
+	}
+
+	public long getWaitingEmployeeCount(){
         return waitingEmployeeCount;
     }
 

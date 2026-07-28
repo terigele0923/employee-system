@@ -19,6 +19,9 @@ public interface EmployeeMapper {
     
     long countActiveEmployees(
     		@Param("salesUserId") Long salesUserId);
+    
+    long countEndingSoonEmployees(
+    		@Param("salesUserId") Long salesUserId);
 
     List<EmployeeSummaryResponse> findEmployees(
             @Param("employmentStatus") String employmentStatus,

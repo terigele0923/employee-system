@@ -12,6 +12,7 @@ public interface EmployeeRepository {
 
     long countWaitingEmployees(Long salesUserId);
     long countActiveEmployees(Long salesUserId);
+    long countEndinSoonEmployees(Long salesUserId);
 
     List<EmployeeSummaryResponse> findEmployees(
             String employmentStatus,

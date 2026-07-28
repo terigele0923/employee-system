@@ -34,7 +34,6 @@ public class MyBatisEmployeeRepository
     
     @Override
 	public long countActiveEmployees(Long salesUserId) {
-		// TODO 自動生成されたメソッド・スタブ
 		return employeeMapper.countActiveEmployees(salesUserId);
 	}
 
@@ -106,6 +105,12 @@ public class MyBatisEmployeeRepository
                 request,
                 createdBy);
     }
+
+	@Override
+	public long countEndinSoonEmployees(Long salesUserId) {
+		
+		return employeeMapper.countEndingSoonEmployees(salesUserId);
+	}
 
 }
 

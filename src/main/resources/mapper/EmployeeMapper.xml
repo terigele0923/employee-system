@@ -36,6 +36,35 @@
 			</if>    	
     
     </select>
+    
+    <select id="countEndingSoonEmployees"
+    		resultType="long">
+    		
+    		SELECT
+    			COUNT(*)
+    		FROM assignments a 
+    		INNER JOIN employees e
+    			ON e.employee_id = a.employee_id
+    			AND e.deleted_at IS NULL
+    			
+    		INNER JOIN projects p
+    			ON p.project_id = a.project_id
+    			AND p.deleted_at IS NULL
+    			
+    		WHERE a.assignment_status = '02'
+    			AND a.contract_end_date IS NOT NULL
+    			AND a.contract_end_date >= CURRENT_DATE
+    			AND a.contract_end_date &lt;= DATE_ADD(
+    				CURRENT_DATE,
+    				INTERVAL 30 DAY
+    			)
+    			AND a.deleted_at IS NULL 
+    			
+    		<if test="salesUserId != null">
+    			AND e.sales_user_id = #{salesUserId}
+    		</if>
+    			
+    </select>
 
     <select id="findEmployees"
             resultType="com.example.employee_system.presentation.response.EmployeeSummaryResponse">
