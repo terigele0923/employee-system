@@ -8,6 +8,7 @@
     <title>従業員一覧 | 社員管理システム</title>
     <link rel="stylesheet"
           th:href="@{/css/bootstrap.min.css}">
+	<link rel ="stylesheet" th:href="@{/css/app.css}">
 </head>
 
 <body class="bg-light">
@@ -101,14 +102,14 @@
                                 </td>
                                 <td>
                                     <span th:text="${employee.employmentStatusName}"
-                                          class="badge"
+                                          class="badge status-badge"
                                           th:classappend="${employee.employmentStatus == '01'} ? 'text-bg-success' : 'text-bg-secondary'">
                                         在籍状態
                                     </span>
                                 </td>
                                 <td>
                                     <span th:text="${employee.workStatusName}"
-                                          class="badge"
+                                          class="badge status-badge "
                                           th:classappend="${employee.workStatus == '01'} ? 'text-bg-warning' : 'text-bg-primary'">
                                         稼働状態
                                     </span>

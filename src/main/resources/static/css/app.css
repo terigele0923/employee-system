@@ -1,0 +1,6 @@
+@charset "UTF-8";
+.status-badge {
+    display: inline-block;
+    width: 4.5rem;
+    text-align: center;
+}
