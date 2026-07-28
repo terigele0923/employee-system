@@ -1,0 +1,75 @@
+<header th:fragment="header(activeMenu)"
+        class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+
+    <div class="container-fluid px-4">
+
+        <a class="navbar-brand text-decoration-none"
+           th:href="@{/dashboard}">
+            社員管理システム
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#globalNavigation"
+                aria-controls="globalNavigation"
+                aria-expanded="false"
+                aria-label="メニューを開く">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="globalNavigation">
+
+            <nav class="navbar-nav me-auto ms-lg-4">
+
+                <a class="nav-link"
+                   th:href="@{/dashboard}"
+                   th:classappend="${activeMenu == 'dashboard'} ? 'active fw-bold' : ''">
+                    ダッシュボード
+                </a>
+
+                <a class="nav-link"
+                   th:href="@{/employees}"
+                   th:classappend="${activeMenu == 'employees'} ? 'active fw-bold' : ''">
+                    従業員
+                </a>
+
+                <span class="nav-link text-white-50 disabled">
+                    案件
+                </span>
+
+                <span class="nav-link text-white-50 disabled">
+                    面談
+                </span>
+
+                <span class="nav-link text-white-50 disabled">
+                    管理
+                </span>
+
+            </nav>
+
+            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+
+                <span class="text-white">
+                    <span th:text="${loginUser.userName}">
+                        ユーザー名
+                    </span>
+                    さん
+                </span>
+
+                <form th:action="@{/logout}"
+                      method="post">
+                    <button type="submit"
+                            class="btn btn-outline-light btn-sm">
+                        ログアウト
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
