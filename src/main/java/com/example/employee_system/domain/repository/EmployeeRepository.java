@@ -11,6 +11,7 @@ import com.example.employee_system.presentation.response.SalesUserOptionResponse
 public interface EmployeeRepository {
 
     long countWaitingEmployees(Long salesUserId);
+    long countActiveEmployees(Long salesUserId);
 
     List<EmployeeSummaryResponse> findEmployees(
             String employmentStatus,

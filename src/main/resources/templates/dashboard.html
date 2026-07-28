@@ -77,11 +77,11 @@
 
 							<a th:href="@{/employees(
 								employmentStatus='01',
-								workStatus='01'
+								workStatus='03'
 							)}"
 							class="text-primary text-decoration-none">
 								<span class="fs-1 fw-bold"
-									th:text="${dashboard.waitingEmployeeCount}">
+									th:text="${dashboard.ActiveEmployeeCount}">
 									0
 								</span>
 								<span class="fs-5 fw-normal">

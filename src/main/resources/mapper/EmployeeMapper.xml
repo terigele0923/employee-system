@@ -20,6 +20,22 @@
         </if>
 
     </select>
+    
+    <select id="countActiveEmployees"
+    		resultType="long">
+    		
+    		SELECT
+    			COUNT(*)
+    		FROM employees e
+    		WHERE e.employment_status = '01'
+    			AND e.work_status = '03'
+    			AND e.deleted_at IS NULL
+    
+			<if test="salesUserId != null">
+				AND e.sales_user_id = #{salesUserId}
+			</if>    	
+    
+    </select>
 
     <select id="findEmployees"
             resultType="com.example.employee_system.presentation.response.EmployeeSummaryResponse">

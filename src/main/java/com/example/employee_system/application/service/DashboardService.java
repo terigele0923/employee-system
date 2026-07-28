@@ -19,10 +19,13 @@ public class DashboardService {
             Long salesUserId
     ){
         long waitingEmployeeCount = employeeRepository.countWaitingEmployees(salesUserId);
+        
+        long activeEmployeeCount  = employeeRepository.countActiveEmployees(salesUserId);
 
         DashboardResponse response = new DashboardResponse();
 
         response.setWaitingEmployeeCount(waitingEmployeeCount);
+        response.setActiveEmployeeCount(activeEmployeeCount);
 
         return response;
     }
