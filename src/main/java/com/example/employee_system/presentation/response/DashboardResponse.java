@@ -5,30 +5,41 @@ public class DashboardResponse {
     private long waitingEmployeeCount;
     private long activeEmployeeCount;
     private long endingSoonEmployeeCount;
+    private long openProjectCount;
+    
+    public long getWaitingEmployeeCount(){
+        return waitingEmployeeCount;
+    }
+    
+    public long getActiveEmployeeCount() {
+		return activeEmployeeCount;
+	}
     
     public long getEndingSoonEmployeeCount() {
 		return endingSoonEmployeeCount;
 	}
 
-	public void setEndingSoonCount(long endingSoonEmployeeCount) {
-		this.endingSoonEmployeeCount = endingSoonEmployeeCount;
+	public long getOpenProjectCount() {
+		return openProjectCount;
 	}
+	
 
-	public long getWaitingEmployeeCount(){
-        return waitingEmployeeCount;
-    }
-
-    public void setWaitingEmployeeCount(
+	public void setWaitingEmployeeCount(
             long waitingEmployeeCount
     ){
         this.waitingEmployeeCount = waitingEmployeeCount;
     }
 
-	public long getActiveEmployeeCount() {
-		return activeEmployeeCount;
-	}
-
 	public void setActiveEmployeeCount(long activeEmployeeCount) {
 		this.activeEmployeeCount = activeEmployeeCount;
 	}
+
+	public void setEndingSoonEmployeeCount(long endingSoonEmployeeCount) {
+		this.endingSoonEmployeeCount = endingSoonEmployeeCount;
+	}
+	
+	public void setOpenProjectCount(long openProjectCount) {
+		this.openProjectCount = openProjectCount;
+	}
+
 }
