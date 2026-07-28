@@ -17,6 +17,7 @@ public interface EmployeeRepository {
     List<EmployeeSummaryResponse> findEmployees(
             String employmentStatus,
             String workStatus,
+            Boolean contractEndingWithin30Days,
             Long salesUserId);
 
     EmployeeDetailResponse findEmployeeById(

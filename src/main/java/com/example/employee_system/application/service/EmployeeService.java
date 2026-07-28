@@ -26,11 +26,13 @@ public class EmployeeService {
     public List<EmployeeSummaryResponse> findEmployees(
             String employmentStatus,
             String workStatus,
+            Boolean contractEndingWithin30Days,
             Long salesUserId) {
 
         return employeeRepository.findEmployees(
                 employmentStatus,
                 workStatus,
+                contractEndingWithin30Days,
                 salesUserId);
     }
 

@@ -74,6 +74,10 @@
             e.employee_no AS employeeNo,
             e.employee_name AS employeeName,
             e.nearest_station AS nearestStation,
+            DATEDIFF(
+            	a.contract_end_date,
+            	CURRENT_DATE
+            	) AS remainingDays,
             e.employment_status AS employmentStatus,
             COALESCE(
                 employment_code.code_name,
@@ -88,6 +92,10 @@
         FROM employees e
         INNER JOIN users u
             ON u.user_id = e.sales_user_id
+        LEFT JOIN assignments a
+        	ON a.employee_id = e.employee_id
+        	AND a.assignment_status = '02'
+        	AND a.deleted_at IS NULL
         LEFT JOIN common_codes employment_code
             ON employment_code.code_type = 'EMPLOYMENT_STATUS'
            AND employment_code.code_value = e.employment_status
@@ -104,6 +112,14 @@
 
         <if test="workStatus != null and workStatus != ''">
             AND e.work_status = #{workStatus}
+        </if>
+        <if test="contractEndingWithin30Days != null and contractEndingWithin30Days">
+        	AND a.contract_end_date IS NOT NULL
+        	AND a.contract_end_date &lt;=DATE_ADD(
+        		CURRENT_DATE,
+        		INTERVAL 30 DAY
+        	)
+        
         </if>
 
         <if test="salesUserId != null">

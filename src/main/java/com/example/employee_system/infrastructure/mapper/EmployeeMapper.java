@@ -26,6 +26,7 @@ public interface EmployeeMapper {
     List<EmployeeSummaryResponse> findEmployees(
             @Param("employmentStatus") String employmentStatus,
             @Param("workStatus") String workStatus,
+            @Param("contractEndingWithin30Days") Boolean contractEndingWithin30Days,
             @Param("salesUserId") Long salesUserId);
 
     EmployeeDetailResponse findEmployeeById(

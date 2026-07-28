@@ -4,10 +4,10 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -41,6 +41,8 @@ public class EmployeeController {
 
     @GetMapping("/employees")
     public String employees(
+    		@RequestParam(required = false)
+    		Boolean contractEndingWithin30Days,
             @RequestParam(required = false)
             String employmentStatus,
             @RequestParam(required = false)
@@ -62,6 +64,7 @@ public class EmployeeController {
                 employeeService.findEmployees(
                         employmentStatus,
                         workStatus,
+                        contractEndingWithin30Days,
                         salesUserId);
 
         model.addAttribute(

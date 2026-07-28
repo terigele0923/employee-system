@@ -11,8 +11,17 @@ public class EmployeeSummaryResponse {
     private String workStatus;
     private String workStatusName;
     private String salesUserName;
+    private Integer remainingDays;
 
-    public Long getEmployeeId() {
+    public Integer getRemainingDays() {
+		return remainingDays;
+	}
+
+	public void setRemainingDays(Integer remainingDays) {
+		this.remainingDays = remainingDays;
+	}
+
+	public Long getEmployeeId() {
         return employeeId;
     }
 

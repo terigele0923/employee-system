@@ -41,11 +41,13 @@ public class MyBatisEmployeeRepository
     public List<EmployeeSummaryResponse> findEmployees(
             String employmentStatus,
             String workStatus,
+            Boolean contractEndingWithin30Days,
             Long salesUserId) {
 
         return employeeMapper.findEmployees(
                 employmentStatus,
                 workStatus,
+                contractEndingWithin30Days,
                 salesUserId);
     }
 

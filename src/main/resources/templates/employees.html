@@ -77,7 +77,12 @@
                         </thead>
 
                         <tbody>
-                            <tr th:each="employee : ${employees}">
+                            <tr th:each="employee : ${employees}"
+								th:classappend="${employee.remainingDays !=null and employee.remainingDays lt 0}
+								? 'table-danger'
+								:(${employee.remainingDays != null and employee.remainingDays le 30}
+									? 'table-warning'
+									: '')">
                                 <td class="px-4"
                                     th:text="${employee.employeeNo}">
                                     E000000001
