@@ -30,6 +30,51 @@
     		
     	
     	</select>
+    	
+     	<select id="countByEmployeeIdAndSkillId"
+     			resultType="long">
+     			
+     		SELECT
+		        COUNT(*)
+		    FROM employee_skills
+		    WHERE employee_id = #{employeeId}
+		      AND skill_id = #{skillId}
+		      AND deleted_at IS NULL
+    	</select>
+    	
+    	<insert id="insert">
+
+		    INSERT INTO employee_skills (
+		        employee_id,
+		        skill_id,
+		        experience_months,
+		        skill_level,
+		        last_used_ym,
+		        remarks,
+		        created_at,
+		        created_by,
+		        updated_at,
+		        updated_by
+		    ) VALUES (
+		        #{employeeId},
+		        #{request.skillId},
+		        #{request.experienceMonths},
+		        #{request.skillLevel},
+		        NULLIF(
+		            #{request.lastUsedYm},
+		            ''
+		        ),
+		        NULLIF(
+		            #{request.remarks},
+		            ''
+		        ),
+		        CURRENT_TIMESTAMP,
+		        #{createdBy},
+		        CURRENT_TIMESTAMP,
+		        #{createdBy}
+		    )
+		
+		</insert>
     
     
     </mapper>

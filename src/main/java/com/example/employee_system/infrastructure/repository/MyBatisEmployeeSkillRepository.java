@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.employee_system.domain.repository.EmployeeSkillRepository;
 import com.example.employee_system.infrastructure.mapper.EmployeeSkillMapper;
+import com.example.employee_system.presentation.request.EmployeeSkillRequest;
 import com.example.employee_system.presentation.response.EmployeeSkillSummaryResponse;
 
 @Repository
@@ -28,5 +29,29 @@ public class MyBatisEmployeeSkillRepository
 		
 		return  employeeSkillMapper.findByEmployeeId(employeeId);
 	    }
+
+
+
+	@Override
+	public boolean existsByEmployeeIdAndSkillId(
+			Long employeeId, 
+			Long skillId) {
+		
+		return employeeSkillMapper
+				.countByEmployeeIdAndSkillId(
+						employeeId,
+						skillId ) >0;
+	}
+
+
+
+	@Override
+	public int insert(
+			Long employeeId,
+			EmployeeSkillRequest request, 
+			Long createdBy) {
+		
+		return employeeSkillMapper.insert(employeeId, request, createdBy);
+	}
 
 }

@@ -21,6 +21,7 @@ import com.example.employee_system.application.service.EmployeeService;
 import com.example.employee_system.application.service.EmployeeSkillService;
 import com.example.employee_system.infrastructure.security.LoginUserDetails;
 import com.example.employee_system.presentation.request.EmployeeCreateRequest;
+import com.example.employee_system.presentation.request.EmployeeSkillRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSkillSummaryResponse;
@@ -151,9 +152,127 @@ public class EmployeeController {
     	
     	model.addAttribute("loginUser",loginUser.getUser());
     	model.addAttribute("employee",employee);
-    	model.addAttribute(skills);
+    	model.addAttribute("skills",skills);
     	
     	return "employee-skills";
+    }
+    
+    @GetMapping("/employees/{employeeId}/skills/new")
+    public String newEmployeeSkill(
+    		@PathVariable
+    		Long employeeId,
+    		@AuthenticationPrincipal
+    		LoginUserDetails loginUser,
+    		Model model) {
+    	
+    	Long salesUserId = resolveSalesUserId(loginUser);
+    	EmployeeDetailResponse employee = 
+    			employeeService.findEmployeeById(employeeId, salesUserId);
+    	
+    	if(employee == null) {
+    		throw new ResponseStatusException(
+    				HttpStatus.NOT_FOUND);
+    	}
+    	
+    	model.addAttribute(
+    			"loginUser",
+    			loginUser.getUser());
+    	
+    	model.addAttribute("employee",
+    			employee);
+    	
+    	model.addAttribute(
+    			"employeeSkillRequest",
+    			new EmployeeSkillRequest());
+    	
+    	model.addAttribute(
+    			"skillOptions",
+    			employeeSkillService.findActiveSkills());
+    	
+    	return "employee-skill-new";
+    	
+    }
+    
+    @PostMapping("/employees/{employeeId}/skills")
+    public String createEmployeeSkill(
+            @PathVariable
+            Long employeeId,
+            @Valid
+            @ModelAttribute
+            EmployeeSkillRequest employeeSkillRequest,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal
+            LoginUserDetails loginUser,
+            Model model) {
+
+        Long salesUserId =
+                resolveSalesUserId(loginUser);
+
+        EmployeeDetailResponse employee =
+                employeeService.findEmployeeById(
+                        employeeId,
+                        salesUserId);
+
+        if (employee == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND);
+        }
+
+        Long skillId =
+                employeeSkillRequest.getSkillId();
+
+        if (skillId != null
+                && !employeeSkillService.existsActiveSkill(
+                        skillId)) {
+
+            bindingResult.rejectValue(
+                    "skillId",
+                    "invalid",
+                    "有効なスキルを選択してください。");
+        }
+
+        if (skillId != null
+                && employeeSkillService.existsEmployeeSkill(
+                        employeeId,
+                        skillId)) {
+
+            bindingResult.rejectValue(
+                    "skillId",
+                    "duplicate",
+                    "このスキルはすでに登録されています。");
+        }
+
+        if (bindingResult.hasErrors()) {
+
+            model.addAttribute(
+                    "loginUser",
+                    loginUser.getUser());
+
+            model.addAttribute(
+                    "employee",
+                    employee);
+
+            model.addAttribute(
+                    "skillOptions",
+                    employeeSkillService.findActiveSkills());
+
+            return "employee-skill-new";
+        }
+
+        boolean created =
+                employeeSkillService.createEmployeeSkill(
+                        employeeId,
+                        employeeSkillRequest,
+                        loginUser.getUser().getUserId());
+
+        if (!created) {
+            throw new IllegalStateException(
+                    "従業員スキルを登録できませんでした。");
+        }
+
+        return "redirect:/employees/"
+                + employeeId
+                + "/skills";
     }
 
     @GetMapping("/employees/{employeeId}/edit")

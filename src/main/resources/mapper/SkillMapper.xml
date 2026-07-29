@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.employee_system.infrastructure.mapper.SkillMapper">
+
+	<select id="findActiveSkills"
+			resultType="com.example.employee_system.presentation.response.SkillOptionResponse">
+			
+		SELECT
+			skill_id AS skillId,
+			category_code AS categoryCode,
+			skill_name AS skillName
+		FROM skills
+		WHERE is_active = TRUE
+			AND deleted_at IS NULL
+		ORDER BY
+			category_code ASC,
+			skill_name ASC
+	
+	</select>
+	
+	<select id="countActiveById"
+			resultType="long">
+			
+			SELECT
+				COUNT(*)
+			FROM skills
+			WHERE skill_id = #{skillId}
+				AND is_active = TRUE
+				AND deleted_at IS NULL
+	</select>
+	
+</mapper>
