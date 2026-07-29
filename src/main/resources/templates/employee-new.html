@@ -12,31 +12,7 @@
 
 <body class="bg-light">
 
-    <header class="navbar navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand mb-0 h1 text-decoration-none"
-               th:href="@{/dashboard}">
-                社員管理システム
-            </a>
-
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-white">
-                    <span th:text="${loginUser.userName}">
-                        ユーザー名
-                    </span>
-                    さん
-                </span>
-
-                <form th:action="@{/logout}"
-                      method="post">
-                    <button type="submit"
-                            class="btn btn-outline-light btn-sm">
-                        ログアウト
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
+<header th:replace="~{fragments/header :: header('dashboard')}"></header>
 
     <main class="container-fluid px-4 py-4">
         <div class="mb-4">

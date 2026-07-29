@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.example.employee_system.infrastructure.mapper.EmployeeSkillMapper">
+    
+    
+    	<select id="findByEmployeeId"
+    			resultType="com.example.employee_system.presentation.response.EmployeeSkillSummaryResponse">
+    			
+    		SELECT
+    			es.employee_skill_id AS employeeSkillId,
+    			s.category_code AS categoryCode,
+    			s.skill_name AS skillName,
+    			es.experience_months AS experienceMonths,
+    			es.skill_level AS skillLevel,
+    			es.last_used_ym AS lastUsedYm,
+    			es.remarks AS remarks
+    			
+    		FROM employee_skills es
+    		INNER JOIN skills s
+    			ON s.skill_id = es.skill_id
+    			AND s.deleted_at IS NULL
+    		WHERE es.employee_id = #{employeeId}
+    			AND es.deleted_at IS NULL
+    		ORDER BY
+    			s.category_code ASC,
+    			s.skill_name ASC
+    		
+    	
+    	</select>
+    
+    
+    </mapper>

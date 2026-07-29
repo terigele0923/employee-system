@@ -18,10 +18,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.employee_system.application.service.CodeService;
 import com.example.employee_system.application.service.EmployeeService;
+import com.example.employee_system.application.service.EmployeeSkillService;
 import com.example.employee_system.infrastructure.security.LoginUserDetails;
 import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
+import com.example.employee_system.presentation.response.EmployeeSkillSummaryResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
 import com.example.employee_system.presentation.response.SalesUserOptionResponse;
 
@@ -30,13 +32,16 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final CodeService codeService;
+    private final EmployeeSkillService employeeSkillService;
 
     public EmployeeController(
             EmployeeService employeeService,
-            CodeService codeService) {
+            CodeService codeService,
+            EmployeeSkillService employeeSkillService) {
 
         this.employeeService = employeeService;
         this.codeService = codeService;
+        this.employeeSkillService = employeeSkillService;
     }
 
     @GetMapping("/employees")
@@ -122,6 +127,33 @@ public class EmployeeController {
                 employee);
 
         return "employee-detail";
+    }
+    
+    @GetMapping("/employees/{employeeId}/skills")
+    public String employeeSkills(
+    		@PathVariable
+    		Long employeeId,
+    		@AuthenticationPrincipal
+    		LoginUserDetails loginUser,
+    		Model model){
+    	
+    	Long salesUserId = resolveSalesUserId(loginUser);
+    	EmployeeDetailResponse employee = 
+    			employeeService.findEmployeeById(employeeId, salesUserId);
+    	
+    	if(employee == null){
+    		throw new ResponseStatusException (
+    				HttpStatus.NOT_FOUND);
+    	}
+    	
+    	List<EmployeeSkillSummaryResponse> skills = 
+    			employeeSkillService.findSkillsByEmployeeId(employeeId);
+    	
+    	model.addAttribute("loginUser",loginUser.getUser());
+    	model.addAttribute("employee",employee);
+    	model.addAttribute(skills);
+    	
+    	return "employee-skills";
     }
 
     @GetMapping("/employees/{employeeId}/edit")
