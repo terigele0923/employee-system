@@ -82,7 +82,9 @@ public class EmployeeSkillRequest {
             String lastUsedYm) {
 
         this.lastUsedYm =
-                lastUsedYm;
+                lastUsedYm == null
+                        ? null
+                        : lastUsedYm.replace("-", "");
     }
 
     public String getRemarks() {
