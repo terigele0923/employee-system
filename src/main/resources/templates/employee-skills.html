@@ -102,7 +102,7 @@
 			                    <th class="py-3">レベル</th>
 			                    <th class="py-3">最終使用年月</th>
 			                    <th class="py-3">備考</th>
-			                    <th class="py-3 text-end pe-4">操作</th>
+			                    <th colspan="2" class="py-3 text-center pe-4">操作</th>
 			                </tr>
 			            </thead>
 
@@ -144,11 +144,25 @@
 			                        業務で使用
 			                    </td>
 
-			                    <td class="text-end pe-4">
-			                        <span class="text-secondary">
-			                            編集・削除は次の工程で実装
-			                        </span>
+			                    <td class="text-center">
+									<a class="btn btn-primary"
+									       th:href="@{/employees/{employeeId}/skills/{employeeSkillId}/edit(
+									           employeeId=${employee.employeeId},
+									           employeeSkillId=${skill.employeeSkillId}
+									       )}">
+									        <span class="text-white">
+									            編集
+									        </span>
+									    </a>
 			                    </td>
+			                    <td class="text-center">
+									<a class="btn btn-danger">
+				                        <span class="text-white">
+				                            削除
+				                        </span>
+									</a>
+			                    </td>
+								
 
 			                </tr>
 			            </tbody>

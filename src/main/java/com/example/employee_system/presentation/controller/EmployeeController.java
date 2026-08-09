@@ -44,6 +44,45 @@ public class EmployeeController {
         this.codeService = codeService;
         this.employeeSkillService = employeeSkillService;
     }
+    
+    @GetMapping(
+    		"/employees/{employeeId}/skills/{employeeSkillId}/edit")
+    public String editEmployeeSkill(
+    		@PathVariable
+			Long employeeId,
+			@PathVariable
+			Long employeeSkillId,
+			@AuthenticationPrincipal
+			LoginUserDetails loginUser,
+			Model model) {
+		
+		Long salesUserId = resolveSalesUserId(loginUser);
+		EmployeeDetailResponse employee = 
+				employeeService.findEmployeeById(employeeId, salesUserId);
+		
+		if(employee == null) {
+			throw new ResponseStatusException(
+					HttpStatus.NOT_FOUND);
+		}
+		
+		EmployeeSkillRequest employeeSkillRequest = 
+				employeeSkillService.findEmployeeSkillById(
+						employeeId, employeeSkillId);
+		
+		if(employeeSkillRequest == null) {
+			throw new ResponseStatusException(
+					HttpStatus.NOT_FOUND);
+		}
+		
+		model.addAttribute("loginUser",loginUser.getUser());
+		model.addAttribute("employee",employee);
+		model.addAttribute("employeeSkillId",employeeSkillId);
+		model.addAttribute("employeeSkillRequest",employeeSkillRequest);
+		model.addAttribute("skillOptions",
+				employeeSkillService.findActiveSkills());
+		
+		return "employee-skill-edit";
+	}
 
     @GetMapping("/employees")
     public String employees(
@@ -129,6 +168,65 @@ public class EmployeeController {
 
         return "employee-detail";
     }
+    
+    @PostMapping("/employees/{employeeId}/skills/{employeeSkillId}/edit")
+    public String updateEmployeeSkill(
+			@PathVariable
+			Long employeeId,
+			@PathVariable
+			Long employeeSkillId,
+			@Valid
+			@ModelAttribute
+			EmployeeSkillRequest employeeSkillRequest,
+			BindingResult bindingResult,
+			@AuthenticationPrincipal
+			LoginUserDetails loginUser,
+			Model model) {
+		
+		Long salesUserId = resolveSalesUserId(loginUser);
+		EmployeeDetailResponse employee = 
+				employeeService.findEmployeeById(employeeId, salesUserId);
+		
+		if(employee == null) {
+			throw new ResponseStatusException(
+					HttpStatus.NOT_FOUND);
+		}
+		
+		if(employeeSkillRequest.getSkillId() != null
+				&& !employeeSkillService.existsActiveSkill(
+						employeeSkillRequest.getSkillId())) {
+			
+			bindingResult.rejectValue(
+					"skillId",
+					"invalid",
+					"有効なスキルを選択してください。");
+		}
+		
+		if(bindingResult.hasErrors()) {
+			
+			model.addAttribute("loginUser",loginUser.getUser());
+			model.addAttribute("employee",employee);
+			model.addAttribute("employeeSkillId",employeeSkillId);
+			model.addAttribute("skillOptions",
+					employeeSkillService.findActiveSkills());
+			
+			return "employee-skill-edit";
+		}
+		
+		boolean updated =
+		        employeeSkillService.updateEmployeeSkill(
+		                employeeId,
+		                employeeSkillId,
+		                employeeSkillRequest,
+		                loginUser.getUser().getUserId());
+
+		if (!updated) {
+		    throw new ResponseStatusException(
+		            HttpStatus.NOT_FOUND);
+		}
+		
+		return "redirect:/employees/" + employeeId + "/skills";
+	}
     
     @GetMapping("/employees/{employeeId}/skills")
     public String employeeSkills(

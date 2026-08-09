@@ -15,4 +15,14 @@ public interface EmployeeSkillRepository {
 			Long employeeId,
 			EmployeeSkillRequest request,
 			Long createdBy);
+	
+	EmployeeSkillRequest findByEmployeeSkillId(
+			Long employeeId,
+			Long employeeSkillId);
+	
+	int updateByEmployeeSkillId(
+			Long employeeId,
+			Long employeeSkillId,
+			EmployeeSkillRequest request,
+			Long updatedBy);
 }

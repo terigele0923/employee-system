@@ -42,6 +42,21 @@
 		      AND deleted_at IS NULL
     	</select>
     	
+    	<select id="findByEmployeeSkillId"
+    			resultType="com.example.employee_system.presentation.request.EmployeeSkillRequest">
+    				
+    				SELECT
+    					skill_id AS skillId,
+    					experience_months AS experienceMonths,
+    					skill_level AS skillLevel,
+    					last_used_ym AS lastUsedYm,
+    					remarks AS remarks
+    				FROM employee_skills
+    				WHERE employee_skill_id = #{employeeSkillId}
+    					AND employee_id = #{employeeId}
+    					AND deleted_at IS NULL
+    			</select>
+    	
     	<insert id="insert">
 
 		    INSERT INTO employee_skills (
@@ -75,6 +90,27 @@
 		    )
 		
 		</insert>
-    
+		
+		<update id="updateByEmployeeSkillId">
+
+            UPDATE employee_skills
+			    SET
+			        skill_id = #{request.skillId},
+			        experience_months = #{request.experienceMonths},
+			        skill_level = #{request.skillLevel},
+			        last_used_ym = NULLIF(
+			            #{request.lastUsedYm},
+			            ''
+			        ),
+			        remarks = NULLIF(
+			            #{request.remarks},
+			            ''
+			        ),
+			        updated_at = CURRENT_TIMESTAMP,
+			        updated_by = #{updatedBy}
+			    WHERE employee_skill_id = #{employeeSkillId}
+			      AND employee_id = #{employeeId}
+			      AND deleted_at IS NULL
+		</update>    
     
     </mapper>

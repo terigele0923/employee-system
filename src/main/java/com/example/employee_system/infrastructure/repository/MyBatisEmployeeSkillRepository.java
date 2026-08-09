@@ -53,5 +53,21 @@ public class MyBatisEmployeeSkillRepository
 		
 		return employeeSkillMapper.insert(employeeId, request, createdBy);
 	}
+	
+	@Override
+	public EmployeeSkillRequest findByEmployeeSkillId(
+			Long employeeId, 
+			Long employeeSkillId) {
+		
+		return employeeSkillMapper.findByEmployeeSkillId(employeeId, employeeSkillId);
+	}
+
+
+
+	@Override
+	public int updateByEmployeeSkillId(Long employeeId, Long employeeSkillId,
+			EmployeeSkillRequest request, Long updatedBy) {
+		return employeeSkillMapper.updateByEmployeeSkillId(employeeId, employeeSkillId, request, updatedBy);
+	}
 
 }

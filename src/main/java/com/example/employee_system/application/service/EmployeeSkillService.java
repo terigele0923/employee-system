@@ -24,10 +24,34 @@ public class EmployeeSkillService {
 		this.skillRepository = skillRepository;
 	}
 	
+	@Transactional
+	public boolean updateEmployeeSkill(
+	        Long employeeId,
+	        Long employeeSkillId,
+	        EmployeeSkillRequest request,
+	        Long updatedBy) {
+
+	    return employeeSkillRepository.updateByEmployeeSkillId(
+	            employeeId,
+	            employeeSkillId,
+	            request,
+	            updatedBy) == 1;
+	}
+	
 	public List<EmployeeSkillSummaryResponse> findSkillsByEmployeeId(
 			Long employeeId) {
 		
 		return employeeSkillRepository.findByEmployeeId(employeeId);
+	}
+	
+	
+	public EmployeeSkillRequest findEmployeeSkillById(
+			Long employeeId,
+			Long employeeSkillId) {
+		
+		return employeeSkillRepository
+				.findByEmployeeSkillId(employeeId, employeeSkillId);
+		
 	}
 	
 	public List<SkillOptionResponse> findActiveSkills(){
