@@ -38,6 +38,18 @@ public class EmployeeSkillService {
 	            updatedBy) == 1;
 	}
 	
+	@Transactional
+	public boolean deleteEmployeeSkill(
+	        Long employeeId,
+	        Long employeeSkillId,
+	        Long updatedBy) {
+
+	    return employeeSkillRepository.deleteByEmployeeSkillId(
+	            employeeId,
+	            employeeSkillId,
+	            updatedBy) == 1;
+	}
+	
 	public List<EmployeeSkillSummaryResponse> findSkillsByEmployeeId(
 			Long employeeId) {
 		

@@ -475,6 +475,34 @@ public class EmployeeController {
 
         return "redirect:/employees";
     }
+    
+    @PostMapping("/employees/{employeeId}/skills/{employeeSkillId}/delete")
+    public  String deleteEmployeeSkill(
+    		@PathVariable
+    		Long employeeId,
+    		@PathVariable
+    		Long employeeSkillId,
+    		@AuthenticationPrincipal
+    		LoginUserDetails loginUser) {
+    	Long salesUserId = resolveSalesUserId(loginUser);
+    	
+    	EmployeeDetailResponse employee = 
+				employeeService.findEmployeeById(employeeId, salesUserId);
+    	
+    	if(employee == null) {
+			throw new ResponseStatusException(
+					HttpStatus.NOT_FOUND);
+		}
+		boolean deleted = employeeSkillService.deleteEmployeeSkill(
+				employeeId,
+				employeeSkillId,
+				loginUser.getUser().getUserId());
+			if(!deleted) {
+				throw new ResponseStatusException(
+						HttpStatus.NOT_FOUND);
+			}
+			return "redirect:/employees/" + employeeId + "/skills";
+    }
 
     @GetMapping("/employees/new")
     public String newEmployee(

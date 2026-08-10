@@ -31,6 +31,11 @@ public interface EmployeeSkillMapper {
 			@Param("employeeId") Long employeeId,
 			@Param("employeeSkillId") Long employeeSkillId,
 			@Param("request") EmployeeSkillRequest request,
-			@Param("updatedBy") Long updatedBy);	
+			@Param("updatedBy") Long updatedBy);
+	
+	int deleteByEmployeeSkillId(
+			@Param("employeeId") Long employeeId,
+			@Param("employeeSkillId") Long employeeSkillId,
+			@Param("updatedBy") Long updatedBy);
 
 }

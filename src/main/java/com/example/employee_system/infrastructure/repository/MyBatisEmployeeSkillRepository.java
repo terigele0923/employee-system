@@ -70,4 +70,12 @@ public class MyBatisEmployeeSkillRepository
 		return employeeSkillMapper.updateByEmployeeSkillId(employeeId, employeeSkillId, request, updatedBy);
 	}
 
+
+
+	@Override
+	public int deleteByEmployeeSkillId(Long employeeId, Long employeeSkillId, Long updatedBy) {
+		
+		return employeeSkillMapper.deleteByEmployeeSkillId(employeeId, employeeSkillId, updatedBy);
+	}
+
 }

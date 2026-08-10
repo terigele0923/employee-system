@@ -156,11 +156,19 @@
 									    </a>
 			                    </td>
 			                    <td class="text-center">
-									<a class="btn btn-danger">
-				                        <span class="text-white">
-				                            削除
-				                        </span>
-									</a>
+									<form th:action="@{/employees/{employeeId}/skills/{employeeSkillId}/delete(
+										employeeId=${employee.employeeId},
+										employeeSkillId=${skill.employeeSkillId})}"
+										method="post"
+										onsubmit="return confirm('このスキルを削除してもよろしいですか？');">
+										
+										<button type="submit"
+                                                class="btn btn-danger">
+                                                <span class="text-white">
+                                                    削除
+                                                </span>
+										</button>
+									</form>
 			                    </td>
 								
 

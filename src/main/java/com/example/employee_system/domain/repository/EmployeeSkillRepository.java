@@ -25,4 +25,9 @@ public interface EmployeeSkillRepository {
 			Long employeeSkillId,
 			EmployeeSkillRequest request,
 			Long updatedBy);
+	
+	int deleteByEmployeeSkillId(
+			Long employeeId,
+			Long employeeSkillId,
+			Long updatedBy);
 }

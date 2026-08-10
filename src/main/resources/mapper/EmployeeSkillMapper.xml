@@ -111,6 +111,17 @@
 			    WHERE employee_skill_id = #{employeeSkillId}
 			      AND employee_id = #{employeeId}
 			      AND deleted_at IS NULL
+		</update>   
+		
+		<update id="deleteByEmployeeSkillId">
+
+            UPDATE employee_skills
+                SET
+                    deleted_at = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP,
+                    updated_by = #{updatedBy}
+                WHERE employee_skill_id = #{employeeSkillId}
+                  AND employee_id = #{employeeId}
+                  AND deleted_at IS NULL
 		</update>    
-    
     </mapper>
