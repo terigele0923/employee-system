@@ -36,7 +36,10 @@ INSERT INTO common_codes (
     ('INTERVIEW_STATUS', '01', '予定', 1),
     ('INTERVIEW_STATUS', '02', '実施済み', 2),
     ('INTERVIEW_STATUS', '03', '延期', 3),
-    ('INTERVIEW_STATUS', '04', 'キャンセル', 4)
+    ('INTERVIEW_STATUS', '04', 'キャンセル', 4),
+	('ASSIGNMENT_STATUS', '01', '予定', 1),
+	('ASSIGNMENT_STATUS', '02', '参画中', 2),
+	('ASSIGNMENT_STATUS', '03', '終了', 3)
 ON DUPLICATE KEY UPDATE
     code_name = VALUES(code_name),
     display_order = VALUES(display_order),
