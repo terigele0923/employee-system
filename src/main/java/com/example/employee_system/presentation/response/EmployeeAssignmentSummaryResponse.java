@@ -15,7 +15,16 @@ public class EmployeeAssignmentSummaryResponse {
 	private String roleName;
 	private String processes;
 	private String remarks;
+	private String assignmentStatusName;
 	
+	
+	public String getAssignmentStatusName() {
+		return assignmentStatusName;
+	}
+
+	public void setAssignmentStatusName(String assignmentStatusName) {
+		this.assignmentStatusName = assignmentStatusName;
+	}
 	
 	public Long getAssignmentId() {
 		return assignmentId;
