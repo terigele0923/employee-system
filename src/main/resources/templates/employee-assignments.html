@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>参加案件一覧 | 社員管理システム</title>
+
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-light">
+
+	<header th:replace="~{fragments/header :: header('employees')}"></header>
+
+	<nav class="bg-white border-bottom" aria-label="従業員詳細メニュー">
+
+		<div class="container-fluid px-4">
+
+			<ul class="nav nav-tabs border-bottom-0">
+
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/employees/{employeeId}(
+                            employeeId=${employee.employeeId}
+                       )}">
+						基本情報
+					</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/employees/{employeeId}/skills(
+                            employeeId=${employee.employeeId}
+                       )}">
+						スキル一覧
+					</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" th:href="@{/employees/{employeeId}/assignments(
+                            employeeId=${employee.employeeId}
+                       )}">
+						参加案件一覧
+					</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link" th:href="@{/employees/{employeeId}/interviews(
+                            employeeId=${employee.employeeId}
+                       )}">
+						面談履歴
+					</a>
+				</li>
+
+			</ul>
+
+		</div>
+	</nav>
+
+	<main class="container-fluid px-4 py-4">
+
+		<div class="mb-4">
+
+			<h1 class="h3 mb-1">
+				参加案件一覧
+			</h1>
+
+			<p class="text-secondary mb-0">
+
+				<span th:text="${employee.employeeNo}">
+					E000000001
+				</span>
+
+				<span class="mx-2">
+					｜
+				</span>
+
+				<span th:text="${employee.employeeName}">
+					従業員名
+				</span>
+
+			</p>
+
+		</div>
+
+		<div class="card border-0 shadow-sm">
+
+			<div class="card-header bg-white px-4 py-3">
+
+				<h2 class="h5 mb-0">
+					登録済み参加案件
+				</h2>
+
+			</div>
+
+			<div class="card-body p-0">
+
+				<div class="table-responsive">
+
+					<table class="table table-hover align-middle mb-0">
+
+						<thead class="table-primary">
+
+							<tr>
+								<th class="px-4 py-3">
+									案件番号
+								</th>
+
+								<th class="py-3">
+									案件名
+								</th>
+
+								<th class="py-3">
+									顧客名
+								</th>
+
+								<th class="py-3">
+									契約開始日
+								</th>
+
+								<th class="py-3">
+									契約終了日
+								</th>
+
+								<th class="py-3">
+									参画状態
+								</th>
+
+								<th class="py-3">
+									役割
+								</th>
+
+								<th class="py-3">
+									担当工程
+								</th>
+
+								<th class="py-3 pe-4">
+									備考
+								</th>
+							</tr>
+
+						</thead>
+
+						<tbody>
+
+							<tr th:each="assignment : ${assignments}">
+
+								<td class="px-4" th:text="${assignment.projectNo}">
+									P000000001
+								</td>
+
+								<td>
+									<a th:href="@{/projects/{projectId}(
+                                        projectId=${assignment.projectId}
+                                    )}" class="link-primary text-decoration-none fw-semibold"
+										th:text="${assignment.projectName}">
+										社員管理システム開発
+									</a>
+
+								</td>
+
+								<td>
+
+									<a th:href="@{/clients/{clientId}(
+									   clientId=${assignment.clientId}
+	                                    )}" class="link-primary text-decoration-none fw-semibold"
+										th:text="${assignment.clientName}">
+										株式会社サンプル
+									</a>
+								</td>
+
+								<td th:text="${assignment.contractStartDate}">
+									2026-01-01
+								</td>
+
+								<td th:text="${assignment.contractEndDate != null
+                                    ? assignment.contractEndDate
+                                    : '-'}">
+									2026-12-31
+								</td>
+
+								<td>
+									<span class="badge" th:text="${assignment.assignmentStatusName}" th:classappend="${assignment.assignmentStatus == '01'}
+                                              ? 'text-bg-warning'
+                                              : (${assignment.assignmentStatus == '02'}
+                                                  ? 'text-bg-success'
+                                                  : 'text-bg-secondary')">
+										参画中
+									</span>
+								</td>
+
+								<td th:text="${assignment.roleName != null
+                                    and !assignment.roleName.isEmpty()
+                                    ? assignment.roleName
+                                    : '-'}">
+									メンバー
+								</td>
+
+								<td th:text="${assignment.processes != null
+                                    and !assignment.processes.isEmpty()
+                                    ? assignment.processes
+                                    : '-'}">
+									詳細設計・開発・テスト
+								</td>
+
+								<td class="pe-4" th:text="${assignment.remarks != null
+                                    and !assignment.remarks.isEmpty()
+                                    ? assignment.remarks
+                                    : '-'}">
+									備考
+								</td>
+
+							</tr>
+
+							<tr th:if="${#lists.isEmpty(assignments)}">
+
+								<td colspan="9" class="text-center text-secondary py-5">
+									参加案件は登録されていません。
+								</td>
+
+							</tr>
+
+						</tbody>
+
+					</table>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</main>
+
+	<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+
+</html>

@@ -17,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.employee_system.application.service.CodeService;
+import com.example.employee_system.application.service.EmployeeAssignmentService;
 import com.example.employee_system.application.service.EmployeeService;
 import com.example.employee_system.application.service.EmployeeSkillService;
 import com.example.employee_system.infrastructure.security.LoginUserDetails;
 import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeSkillRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
+import com.example.employee_system.presentation.response.EmployeeAssignmentSummaryResponse;
 import com.example.employee_system.presentation.response.EmployeeDetailResponse;
 import com.example.employee_system.presentation.response.EmployeeSkillSummaryResponse;
 import com.example.employee_system.presentation.response.EmployeeSummaryResponse;
@@ -34,15 +36,18 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final CodeService codeService;
     private final EmployeeSkillService employeeSkillService;
+    private final EmployeeAssignmentService employeeAssignmentService;
 
     public EmployeeController(
             EmployeeService employeeService,
             CodeService codeService,
-            EmployeeSkillService employeeSkillService) {
+            EmployeeSkillService employeeSkillService,
+            EmployeeAssignmentService employeeAssignmentService) {
 
         this.employeeService = employeeService;
         this.codeService = codeService;
         this.employeeSkillService = employeeSkillService;
+        this.employeeAssignmentService = employeeAssignmentService;
     }
     
     @GetMapping(
@@ -606,6 +611,34 @@ public class EmployeeController {
 
         return "redirect:/employees/" + employeeId;
     }
+    
+    @GetMapping("employees/{employeeId}/assignments")
+    public String employeeAssignments(
+    		@PathVariable
+    		Long employeeId,
+    		@AuthenticationPrincipal
+    		LoginUserDetails loginUser,
+    		Model model) {
+    	
+    	Long salesUserId = resolveSalesUserId(loginUser);
+    	
+    	EmployeeDetailResponse employee = 
+				employeeService.findEmployeeById(employeeId, salesUserId);
+    	
+    	if(employee == null) {
+    		throw new ResponseStatusException(
+					HttpStatus.NOT_FOUND);
+    	}
+    	
+    	List<EmployeeAssignmentSummaryResponse> assignments = 
+				employeeAssignmentService.findAssignmentsByEmployeeId(employeeId);
+    	 model.addAttribute("loginUser",loginUser.getUser());
+    	    model.addAttribute("employee",employee);
+    		model.addAttribute("assignments",assignments);
+    			
+    			return "employee-assignments";
+    }
+    
 
     private Long resolveSalesUserId(
             LoginUserDetails loginUser) {

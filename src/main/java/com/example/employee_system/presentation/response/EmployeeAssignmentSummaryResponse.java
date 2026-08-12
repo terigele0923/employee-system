@@ -8,6 +8,7 @@ public class EmployeeAssignmentSummaryResponse {
 	private Long projectId;
 	private String projectNo;
 	private String projectName;
+	private Long clientId;
 	private String clientName;
 	private LocalDate contractStartDate;
 	private LocalDate contractEndDate;
@@ -56,6 +57,14 @@ public class EmployeeAssignmentSummaryResponse {
 
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
+	}
+	
+	public Long getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(Long clientId) {
+		this.clientId = clientId;
 	}
 
 	public String getClientName() {
