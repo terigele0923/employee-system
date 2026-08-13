@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.employee_system.domain.repository.AssignmentRepository;
 import com.example.employee_system.infrastructure.mapper.AssignmentMapper;
+import com.example.employee_system.presentation.request.EmployeeAssignmentRequest;
 import com.example.employee_system.presentation.response.EmployeeAssignmentSummaryResponse;
 
 @Repository
@@ -23,6 +24,12 @@ public class MyBatisAssingmentRepository
 		
 		return assignmentMapper.findByEmployeeId(employeeId);
 	    }
+
+	@Override
+	public int insert(Long employeeId, EmployeeAssignmentRequest request, Long createdBy) {
+		
+		return assignmentMapper.insert(employeeId, request, createdBy);
+	}
 	
 	
 }

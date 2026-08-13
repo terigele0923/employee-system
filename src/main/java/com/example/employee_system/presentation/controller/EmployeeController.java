@@ -21,6 +21,7 @@ import com.example.employee_system.application.service.EmployeeAssignmentService
 import com.example.employee_system.application.service.EmployeeService;
 import com.example.employee_system.application.service.EmployeeSkillService;
 import com.example.employee_system.infrastructure.security.LoginUserDetails;
+import com.example.employee_system.presentation.request.EmployeeAssignmentRequest;
 import com.example.employee_system.presentation.request.EmployeeCreateRequest;
 import com.example.employee_system.presentation.request.EmployeeSkillRequest;
 import com.example.employee_system.presentation.request.EmployeeUpdateRequest;
@@ -639,6 +640,144 @@ public class EmployeeController {
     			return "employee-assignments";
     }
     
+    @GetMapping("/employees/{employeeId}/assignments/new")
+    public String newEmployeeAssignment(
+            @PathVariable
+            Long employeeId,
+            @AuthenticationPrincipal
+            LoginUserDetails loginUser,
+            Model model) {
+
+        Long salesUserId =
+                resolveSalesUserId(loginUser);
+
+        EmployeeDetailResponse employee =
+                employeeService.findEmployeeById(
+                        employeeId,
+                        salesUserId);
+
+        if (employee == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND);
+        }
+
+        model.addAttribute(
+                "loginUser",
+                loginUser.getUser());
+
+        model.addAttribute(
+                "employee",
+                employee);
+
+        model.addAttribute(
+                "employeeAssignmentRequest",
+                new EmployeeAssignmentRequest());
+
+        model.addAttribute(
+                "projectOptions",
+                employeeAssignmentService.findProjectOptions());
+
+        model.addAttribute(
+                "assignmentStatuses",
+                codeService.findByType(
+                        CodeService.ASSIGNMENT_STATUS));
+
+        model.addAttribute(
+                "formMode",
+                "create");
+
+        return "employee-assignment-form";
+    }
+    
+    @PostMapping("/employees/{employeeId}/assignments")
+    public String createEmployeeAssignment(
+    		@PathVariable
+    		Long employeeId,
+    		@Valid
+    		@ModelAttribute
+    		EmployeeAssignmentRequest employeeAssignmentRequest,
+    		BindingResult bindingResult,
+    		@AuthenticationPrincipal
+    		LoginUserDetails loginUser,
+    		Model model) {
+    	
+    	Long salesUserId = resolveSalesUserId(loginUser);
+    	
+    	EmployeeDetailResponse employee = 
+    			employeeService.findEmployeeById(
+    					employeeId, 
+    					salesUserId);
+    	
+    	if(employee == null) {
+    		throw new ResponseStatusException(
+    				HttpStatus.NOT_FOUND);
+    	}
+    	
+    	if(!bindingResult.hasFieldErrors("assignmentStatus")
+    			&& !codeService.exists(
+    					CodeService.ASSIGNMENT_STATUS,
+    					employeeAssignmentRequest.getAssignmentStatus())) {
+    		
+    		bindingResult.rejectValue(
+					"assignmentStatus",
+					"invalid",
+					"有効なアサイン状態を選択してください。");
+    	}
+    	
+    	if(employeeAssignmentRequest.getContractStartDate()
+    			!=null
+    			&& employeeAssignmentRequest.getContractEndDate() != null
+    			&& employeeAssignmentRequest.getContractEndDate()
+    					.isBefore(
+    							employeeAssignmentRequest
+    									.getContractStartDate())) {
+    		
+    		bindingResult.rejectValue(
+    				"contractEndDate",
+    				"period",
+    				"契約終了日は契約開始日以降の日付を指定してください。");
+    	}
+    	
+    	if(bindingResult.hasErrors()) {
+			
+			model.addAttribute(
+					"loginUser",
+					loginUser.getUser());
+			
+			model.addAttribute(
+					"employee",
+					employee);
+			
+			model.addAttribute(
+					"projectOptions",
+					employeeAssignmentService.findProjectOptions());
+			
+			model.addAttribute(
+					"assignmentStatuses",
+					codeService.findByType(
+							CodeService.ASSIGNMENT_STATUS));
+			
+			model.addAttribute(
+					"formMode",
+					"create");
+			
+			return "employee-assignment-form";
+		}
+    	
+    	boolean created = 
+    			employeeAssignmentService
+    				.createEmployeeAssignment(
+						employeeId,
+						employeeAssignmentRequest,
+						loginUser.getUser().getUserId());
+    	
+    	if(!created) {
+    			throw new IllegalStateException(
+					"従業員アサインを登録できませんでした。");
+    	}
+    	
+    	return "redirect:/employees/" + employeeId + "/assignments";
+    }
 
     private Long resolveSalesUserId(
             LoginUserDetails loginUser) {

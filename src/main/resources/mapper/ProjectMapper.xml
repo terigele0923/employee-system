@@ -19,4 +19,24 @@
 			AND p.sales_user_id = #{salesUserId}
 		</if>
 	</select>
+	
+	<select id="findProjectOptions"
+        resultType="com.example.employee_system.presentation.response.ProjectOptionResponse">
+
+    SELECT
+        p.project_id AS projectId,
+        p.project_no AS projectNo,
+        p.project_name AS projectName,
+        c.client_name AS clientName
+    FROM projects p
+    INNER JOIN clients c
+        ON p.client_id = c.client_id
+       AND c.deleted_at IS NULL
+    WHERE p.deleted_at IS NULL
+    ORDER BY
+        p.project_no ASC,
+        p.project_name ASC
+
+</select>
+       
 </mapper>

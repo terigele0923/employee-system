@@ -41,5 +41,35 @@
             a.assignment_id DESC
 
     </select>
+    
+    <insert id="insert">
+    	
+    	INSERT INTO assignments (
+            employee_id,
+            project_id,
+            contract_start_date,
+            contract_end_date,
+            assignment_status,
+            role_name,
+            processes,
+            remarks,
+            created_by,
+            updated_by
+        )
+        VALUES (
+            #{employeeId},
+            #{request.projectId},
+            #{request.contractStartDate},
+            #{request.contractEndDate},
+            #{request.assignmentStatus},
+            #{request.roleName},
+            #{request.processes},
+            #{request.remarks},
+            #{createdBy},
+            #{createdBy}
+        )
+    	
+    	
+    </insert>
 
 </mapper>

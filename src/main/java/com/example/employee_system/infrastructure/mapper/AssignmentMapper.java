@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.example.employee_system.presentation.request.EmployeeAssignmentRequest;
 import com.example.employee_system.presentation.response.EmployeeAssignmentSummaryResponse;
 
 @Mapper
@@ -12,5 +13,13 @@ public interface AssignmentMapper {
 	
 	List<EmployeeAssignmentSummaryResponse> findByEmployeeId(
 			@Param("employeeId") Long employeeId);
+
+	int insert(
+			@Param("employeeId")
+			Long employeeId, 
+			@Param("request")
+			EmployeeAssignmentRequest request,
+			@Param("createdBy")
+			Long createdBy);
 
 }

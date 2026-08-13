@@ -15,6 +15,9 @@ public class CodeService {
 
     public static final String WORK_STATUS =
             "WORK_STATUS";
+    
+    public static final String  ASSIGNMENT_STATUS =
+			"ASSIGNMENT_STATUS";
 
     private final CodeRepository codeRepository;
 

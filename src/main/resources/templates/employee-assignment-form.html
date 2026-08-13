@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title th:text="${formMode == 'create'}
+            ? '参加案件追加 | 社員管理システム'
+            : '参加案件編集 | 社員管理システム'">
+        参加案件 | 社員管理システム
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body class="bg-light">
+
+    <header th:replace="~{fragments/header :: header('employees')}"></header>
+
+    <nav class="bg-white border-bottom"
+         aria-label="従業員詳細メニュー">
+
+        <div class="container-fluid px-4">
+
+            <ul class="nav nav-tabs border-bottom-0">
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/employees/{employeeId}(
+                            employeeId=${employee.employeeId}
+                       )}">
+                        基本情報
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/employees/{employeeId}/skills(
+                            employeeId=${employee.employeeId}
+                       )}">
+                        スキル一覧
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       aria-current="page"
+                       th:href="@{/employees/{employeeId}/assignments(
+                            employeeId=${employee.employeeId}
+                       )}">
+                        参加案件一覧
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       th:href="@{/employees/{employeeId}/interviews(
+                            employeeId=${employee.employeeId}
+                       )}">
+                        面談履歴
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+    </nav>
+
+    <main class="container-fluid px-4 py-4">
+
+        <div class="mb-4">
+
+            <h1 class="h3 mb-1"
+                th:text="${formMode == 'create'}
+                        ? '参加案件追加'
+                        : '参加案件編集'">
+                参加案件追加
+            </h1>
+
+            <p class="text-secondary mb-0">
+
+                <span th:text="${employee.employeeNo}">
+                    E000000001
+                </span>
+
+                <span class="mx-2">｜</span>
+
+                <span th:text="${employee.employeeName}">
+                    従業員名
+                </span>
+
+            </p>
+
+        </div>
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-header bg-white px-4 py-3">
+
+                <h2 class="h5 mb-0">
+                    参加案件情報
+                </h2>
+
+            </div>
+
+            <div class="card-body p-4">
+
+                <form th:action="${formMode == 'create'}
+                        ? @{/employees/{employeeId}/assignments(
+                            employeeId=${employee.employeeId}
+                          )}
+                        : @{/employees/{employeeId}/assignments/{assignmentId}/edit(
+                            employeeId=${employee.employeeId},
+                            assignmentId=${assignmentId}
+                          )}"
+                      th:object="${employeeAssignmentRequest}"
+                      method="post">
+
+                    <div class="row g-4">
+
+                        <div class="col-12">
+
+                            <label for="projectId"
+                                   class="form-label">
+                                案件
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="projectId"
+                                    class="form-select"
+                                    th:field="*{projectId}"
+                                    th:errorclass="is-invalid"
+                                    required>
+
+                                <option value="">
+                                    選択してください
+                                </option>
+
+                                <option th:each="project : ${projectOptions}"
+                                        th:value="${project.projectId}"
+                                        th:text="|${project.projectNo}：${project.projectName}（${project.clientName}）|">
+                                    P000000001：社員管理システム開発（ABC株式会社）
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{projectId}">
+                                案件を選択してください。
+                            </div>
+
+                        </div>
+
+                        <div class="col-12 col-md-6">
+
+                            <label for="contractStartDate"
+                                   class="form-label">
+                                契約開始日
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input id="contractStartDate"
+                                   type="date"
+                                   class="form-control"
+                                   th:field="*{contractStartDate}"
+                                   th:errorclass="is-invalid"
+                                   required>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{contractStartDate}">
+                                契約開始日を入力してください。
+                            </div>
+
+                        </div>
+
+                        <div class="col-12 col-md-6">
+
+                            <label for="contractEndDate"
+                                   class="form-label">
+                                契約終了日
+                            </label>
+
+                            <input id="contractEndDate"
+                                   type="date"
+                                   class="form-control"
+                                   th:field="*{contractEndDate}"
+                                   th:errorclass="is-invalid">
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{contractEndDate}">
+                                契約終了日を確認してください。
+                            </div>
+
+                        </div>
+
+                        <div class="col-12 col-md-6">
+
+                            <label for="assignmentStatus"
+                                   class="form-label">
+                                参画状態
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="assignmentStatus"
+                                    class="form-select"
+                                    th:field="*{assignmentStatus}"
+                                    th:errorclass="is-invalid"
+                                    required>
+
+                                <option value="">
+                                    選択してください
+                                </option>
+
+                                <option th:each="status : ${assignmentStatuses}"
+                                        th:value="${status.codeValue}"
+                                        th:text="${status.codeName}">
+                                    参画中
+                                </option>
+
+                            </select>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{assignmentStatus}">
+                                参画状態を選択してください。
+                            </div>
+
+                        </div>
+
+                        <div class="col-12 col-md-6">
+
+                            <label for="roleName"
+                                   class="form-label">
+                                役割
+                            </label>
+
+                            <input id="roleName"
+                                   type="text"
+                                   class="form-control"
+                                   th:field="*{roleName}"
+                                   th:errorclass="is-invalid"
+                                   maxlength="100"
+                                   placeholder="例：プログラマー">
+
+                            <div class="form-text">
+                                100文字以内で入力してください。
+                            </div>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{roleName}">
+                                役割を確認してください。
+                            </div>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <label for="processes"
+                                   class="form-label">
+                                担当工程
+                            </label>
+
+                            <input id="processes"
+                                   type="text"
+                                   class="form-control"
+                                   th:field="*{processes}"
+                                   th:errorclass="is-invalid"
+                                   maxlength="200"
+                                   placeholder="例：詳細設計、製造、単体テスト">
+
+                            <div class="form-text">
+                                200文字以内で入力してください。
+                            </div>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{processes}">
+                                担当工程を確認してください。
+                            </div>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <label for="remarks"
+                                   class="form-label">
+                                備考
+                            </label>
+
+                            <textarea id="remarks"
+                                      class="form-control"
+                                      th:field="*{remarks}"
+                                      th:errorclass="is-invalid"
+                                      rows="4"
+                                      maxlength="500"></textarea>
+
+                            <div class="form-text">
+                                500文字以内で入力してください。
+                            </div>
+
+                            <div class="invalid-feedback"
+                                 th:errors="*{remarks}">
+                                備考を確認してください。
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+
+                        <a class="btn btn-outline-secondary"
+                           th:href="@{/employees/{employeeId}/assignments(
+                                employeeId=${employee.employeeId}
+                           )}">
+                            キャンセル
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                th:text="${formMode == 'create'}
+                                        ? '登録'
+                                        : '更新'">
+                            登録
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+
+</html>

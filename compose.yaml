@@ -13,7 +13,11 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -proot"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -p\"$${MYSQL_ROOT_PASSWORD}\""
+        ]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -23,6 +27,8 @@ services:
       - employee_network
 
   spring_employee:
+    profiles:
+      - docker-app
     build:
       context: .
       dockerfile: Dockerfile
@@ -35,7 +41,7 @@ services:
     depends_on:
       spring_db:
         condition: service_healthy
-    restart: on-failure
+    restart: "no"
     networks:
       - employee_network
 
